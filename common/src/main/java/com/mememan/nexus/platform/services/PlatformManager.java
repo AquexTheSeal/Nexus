@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A loader-agnostic interface for managing platform-specific implementations of certain loader-specific features,
- * ranging from methods that provide predicates for loader detection to methods that allow for more performant ways of
- * executing certain tasks, such as class-loading, environment-detection, etc.
+ * A loader-agnostic {@code interface} for managing platform-specific implementations of certain loader-specific
+ * features, ranging from methods that provide predicates for loader detection to methods that allow for more performant
+ * ways of executing certain tasks, such as class-loading, environment-detection, etc.
  * <br></br>
  * Methods provided here are a mix of template-default utilities included in the MultiLoader template, as well as more
- * sophisticated helpers aimed at more specific tasks.
+ * sophisticated helpers aimed at simplifying more specific tasks.
  */
 public interface PlatformManager {
 
