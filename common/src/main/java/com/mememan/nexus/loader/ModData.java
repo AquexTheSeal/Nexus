@@ -25,9 +25,45 @@ public interface ModData {
     @NotNull
     ModMetadata getModMetadata();
 
+    /**
+     * Caches/gets a {@link List} of every single formatted path within this instance's owning mod's JAR file on
+     * startup.
+     * <br></br>
+     * Mind that when using the word "formatted" in this case, it refers to paths that go something like
+     * {@code "com.mememan.nexus.loader.ModData"} (I.E. NOT the canonical system path to any given class file).
+     *
+     * @return A {@link List} of every single formatted path within this instance's owning mod's JAR file.
+     *
+     * @apiNote This method also works for files within the dev environment under the {@code "build/..."} directory.
+     */
     List<String> getAllFilePaths();
 
-    List<String> getAllClassPaths();
+    /**
+     * Overloaded variant of {@link #getAllFilePaths()} that caches/gets a lexicographically-sorted {@link List} of
+     * all {@code class} files within this instance's owning mod's JAR file.
+     *
+     * @return A lexicographically-sorted {@link List} of all {@code class} files within this instance's owning mod's
+     * JAR file.
+     */
+    default List<String> getAllClassPaths() {
+        return getAllFilePaths().stream()
+                .filter(path -> path.endsWith(".class"))
+                .sorted(String::compareTo)
+                .toList();
+    }
 
+    /**
+     * Discovers all (mod) classes that are annotated with the specified annotation type and compiles them into a
+     * {@link List}. Take note that this method <b>loads</b> (valid) discovered classes.
+     *
+     * @param annotationTypeClazz The annotation type class.
+     *
+     * @return A {@link List} of (loaded) classes within this instance's owning mod annotated with the specified
+     * annotation type. May be empty.
+     *
+     * @apiNote The reason this method doesn't have a {@code default} implementation using {@link #getAllClassPaths()}
+     * and the likes is that each loader may have a more efficient/direct way of accessing and filtering class files
+     * accordingly.
+     */
     List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz);
 }

@@ -7,6 +7,7 @@ import com.mememan.nexus.loader.ModLoader;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -51,15 +52,49 @@ public interface PlatformManager {
      * {@link List}. Take note that this method <b>loads</b> (valid) discovered classes.
      *
      * @param annotationTypeClazz The annotation type class.
+     * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
+     *                           <b>before</b> loading them. May be {@code null}.
+     * @param validModIds An optional whitelist of valid mod IDs to scan for annotated classes. Leaving this empty or
+     *                    {@code null} will result in a scan for annotated classes from all mods.
+     *
+     * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
+     *
+     * @apiNote If multiple calls are made to this method targeting the same exact {@code annotationTypeClazz} whose
+     * corresponding annotated classes are loaded, this method will simply compute and return the same result without
+     * actually doing anything to the already loaded classes.
+     */
+    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable List<String> validModIds);
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)} that uses the default
+     * {@link String#compareTo(String)} comparator for sorting.
+     *
+     * @param annotationTypeClazz The annotation type class.
      * @param validModIds An optional whitelist of valid mod IDs to scan for annotated classes. Leaving this empty or
      *                    {@code null} will result in a scan for annotated classes from all mods.
      *
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      */
-    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable List<String> validModIds);
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable List<String> validModIds) {
+        return discoverAnnotatedClasses(annotationTypeClazz, String::compareTo, validModIds);
+    }
 
     /**
-     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, List)}. Will scan for annotated classes from all
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)}. Will scan for annotated classes
+     * from all mods.
+     *
+     * @param annotationTypeClazz The annotation type class.
+     * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
+     *                           <b>before</b> loading them. May be {@code null}.
+     *
+     * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
+     */
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter) {
+        return discoverAnnotatedClasses(annotationTypeClazz, classLoadingSorter, null);
+    }
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)}. Will scan for annotated classes from all
      * mods.
      *
      * @param annotationTypeClazz The annotation type class.
@@ -67,12 +102,15 @@ public interface PlatformManager {
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      */
     default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz) {
-        return discoverAnnotatedClasses(annotationTypeClazz, null);
+        return discoverAnnotatedClasses(annotationTypeClazz, null, null);
     }
 
     /**
      * Gets all loaded mods and converts them into their respective {@link ModData} representation before pooling them
      * into a {@link Set}. Different loaders have different implementations of {@link ModData}.
+     * <br></br>
+     * This shouldn't have any major performance overhead. At its worst, it should only really add a few extra seconds
+     * to the game's startup time, and that's only on its first call when nothing's cached yet.
      *
      * @return A {@link Set} of all loaded mods, represented as {@link ModData} objects.
      */
