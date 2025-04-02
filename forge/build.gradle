@@ -6,7 +6,7 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_name}-${mod_version}-${minecraft_version}-forge"
+    archivesName = "${mod_id}-${mod_version}-${minecraft_version}-forge"
 }
 
 mixin {
@@ -159,13 +159,13 @@ publishMods {
     displayName = "${mod_name} v${minecraft_version}-${mod_version}"
     type = STABLE
 
-    modLoaders.add("forge")
+    modLoaders.addAll("forge", "neoforge")
 
     curseforge {
         projectId = ""
         projectSlug = "nexus"
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-        announcementTitle = "New Nexus API CurseForge Release"
+        announcementTitle = "New Nexus API CurseForge Release (Neo/Forge)"
 
         getMinecraftVersions().add(minecraft_version)
     }
@@ -173,7 +173,7 @@ publishMods {
     modrinth {
         projectId = ""
         accessToken = providers.environmentVariable("MODRINTH_API_KEY")
-        announcementTitle = "New Nexus API Modrinth Release"
+        announcementTitle = "New Nexus API Modrinth Release (Neo/Forge)"
 
         getMinecraftVersions().add(minecraft_version)
     }

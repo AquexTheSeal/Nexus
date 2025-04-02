@@ -1,6 +1,7 @@
 package com.mememan.nexus.platform.services;
 
 import com.mememan.nexus.Nexus;
+import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,7 +28,15 @@ public interface Registrar {
 
     /**
      * Main method for this service interface, called in {@link Nexus} in order to load it and its loader-specific
-     * implementations accordingly. Should NOT be called anywhere else!
+     * implementations accordingly.
+     * <br></br>
+     * Functionally speaking, all this method does is properly load and cache registry information on startup. It also
+     * handles loading all classes annotated with {@link RegistrarEntry}.
+     * <br></br>
+     * Dependant mods may choose to opt out of this auto-loading feature either by simply not annotating their classes
+     * with {@link RegistrarEntry}, or specifying so in the annotation's parameters.
+     * <br></br>
+     * Should <b>NOT</b> be called anywhere else!
      */
     void setupRegistrar();
 
@@ -56,7 +65,7 @@ public interface Registrar {
     <V, T extends V> Supplier<T> registerObject(final ResourceLocation objId, final Supplier<T> objSup, Registry<V> targetRegistry);
 
     /**
-     * Attempts to register a datapack object to the specified {@linkplain ResourceKey <Registry<T>> targetRegistry}.
+     * Attempts to register a datapack object to the specified {@linkplain ResourceKey<Registry<T>> targetRegistry}.
      * <br></br>
      * Generally, any datapack registries available in the {@link Registries} class can be used for this method. This
      * could include custom datapack registries. Datapack registries are {@linkplain Registry Registries} that store any

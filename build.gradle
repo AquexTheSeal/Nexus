@@ -13,7 +13,6 @@ subprojects {
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
-    java.withJavadocJar()
 
     jar {
         from(rootProject.file("LICENSE")) {
@@ -197,13 +196,20 @@ subprojects {
         enabled = false
     }
 
+    def useLocal = true
+
     publishing {
         repositories {
-            maven {
-                name = ""
-                url = ""
+            if (useLocal) mavenLocal()
+            else {
+                maven {
+                    name = "cloudsmith"
+                    url = "https://api.cloudsmith.io/maven/meme-man-mods/nexus/"
 
-                credentials {
+                    credentials {
+                        username = System.getenv("CLOUDSMITH_USERNAME")
+                        password = System.getenv("CLOUDSMITH_API_KEY")
+                    }
                 }
             }
         }

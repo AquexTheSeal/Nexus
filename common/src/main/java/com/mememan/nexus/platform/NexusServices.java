@@ -1,7 +1,9 @@
 package com.mememan.nexus.platform;
 
 import com.mememan.nexus.NexusConstants;
+import com.mememan.nexus.platform.services.NetworkManager;
 import com.mememan.nexus.platform.services.PlatformManager;
+import com.mememan.nexus.platform.services.Registrar;
 
 import java.util.ServiceLoader;
 
@@ -19,6 +21,15 @@ public class NexusServices {
      * The central service for managing platform-specific tasks handled on a per-loader basis.
      */
     public static final PlatformManager PLATFORM_MANAGER = loadService(PlatformManager.class);
+    /**
+     * The service responsible for handling all types of object registration (save for packet registration, which is
+     * handled by {@link #NETWORK_MANAGER}).
+     */
+    public static final Registrar REGISTRAR = loadService(Registrar.class);
+    /**
+     * The service responsible for handling packet registration and interaction across sides (Client/Server).
+     */
+    public static final NetworkManager NETWORK_MANAGER = loadService(NetworkManager.class);
 
     /**
      * Internal service loader method for loading platform-agnostic services.

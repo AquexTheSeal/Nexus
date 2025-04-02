@@ -1,7 +1,7 @@
 package com.mememan.nexus.loader;
 
 /**
- * A basic holder enum representing mod-loaders as objects.
+ * A basic holder {@code enum} representing mod-loaders as objects.
  */
 public enum ModLoader {
     FORGE("Forge"),

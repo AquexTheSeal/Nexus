@@ -1,7 +1,7 @@
 package com.mememan.nexus.loader;
 
 /**
- * A basic holder enum representing environment types as objects.
+ * A basic holder {@code enum} representing environment types as objects.
  */
 public enum EnvironmentType {
     DEVELOPMENT("Development"),

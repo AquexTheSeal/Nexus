@@ -1,7 +1,7 @@
 package com.mememan.nexus.loader;
 
 /**
- * A basic holder enum representing environment sides for mods as objects.
+ * A basic holder {@code enum} representing environment sides for mods as objects.
  */
 public enum ModSide {
     CLIENT("Client"),

@@ -3,7 +3,7 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_name}-${mod_version}-${minecraft_version}-common"
+    archivesName = "${mod_id}-${mod_version}-${minecraft_version}-common"
 }
 
 minecraft {

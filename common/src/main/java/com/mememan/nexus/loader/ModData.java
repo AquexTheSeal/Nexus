@@ -1,8 +1,10 @@
 package com.mememan.nexus.loader;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -57,6 +59,8 @@ public interface ModData {
      * {@link List}. Take note that this method <b>loads</b> (valid) discovered classes.
      *
      * @param annotationTypeClazz The annotation type class.
+     * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
+     *                           <b>before</b> loading them. May be {@code null}.
      *
      * @return A {@link List} of (loaded) classes within this instance's owning mod annotated with the specified
      * annotation type. May be empty.
@@ -65,5 +69,5 @@ public interface ModData {
      * and the likes is that each loader may have a more efficient/direct way of accessing and filtering class files
      * accordingly.
      */
-    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz);
+    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter);
 }
