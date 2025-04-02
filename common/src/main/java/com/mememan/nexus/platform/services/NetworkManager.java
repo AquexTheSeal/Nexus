@@ -1,6 +1,7 @@
 package com.mememan.nexus.platform.services;
 
 import com.mememan.nexus.Nexus;
+import com.mememan.nexus.asm.annotations.NetworkRegistrarEntry;
 import com.mememan.nexus.network.BasePacket;
 import com.mememan.nexus.network.NetworkSide;
 import net.minecraft.core.BlockPos;
@@ -23,17 +24,63 @@ public interface NetworkManager {
      * Main method for this service interface, called in {@link Nexus} in order to load it and its loader-specific
      * implementations accordingly.
      * <br></br>
-     *
+     * Functionally speaking, all this method does is properly load {@link NetworkRegistrarEntry}-annotated classes.
      * <br></br>
-     * Should NOT be called anywhere else!
+     * Should <b>NOT</b> be called anywhere else!
      */
     void setupNetworkHandler();
 
     /**
      * Method for registering S2C/C2S packets (based on the provided {@linkplain BasePacket BasePacket's}
      * {@link NetworkSide} definition).
+     * <br></br>
+     * You'd usually call this method like so:
+     * <pre>
+     *     {@code
+     *         @NetworkRegistrarEntry // Optional; you can use bootstrap methods or some other way to statically initialize this class
+     *         public class MyPacketRegistrarClass {
      *
-     * @param packet The packet object to register.
+     *             public static final BasePacket MY_PACKET = registerPacket(new BasePacket(new ResourceLocation("my_modid", "my_packet"), MyPacket.class, MyPacket::encode, MyPacket::decode, MyPacket::handle, NetworkSide.CLIENT_TO_SERVER));
+     *
+     *             private static <MSGT> BasePacket<MSGT> registerPacket(BasePacket<MSGT> packet) {
+     *                  return NexusServices.NETWORK_MANAGER.registerPacket(packet);
+     *             }
+     *         }
+     *
+     *         // ...
+     *
+     *         public class MyPacket {
+     *              private final int someInt;
+     *              private final String someString;
+     *
+     *              public MyPacket(int someInt, String someString) {
+     *                  this.someInt = someInt;
+     *                  this.someString = someString;
+     *              }
+     *
+     *              public MyPacket(FriendlyByteBuf buf) { // ALT: You can use this overloaded constructor for decoding instead
+     *                  this(buf.readInt(), buf.readUtf());
+     *              }
+     *
+     *              public static MyPacket decode(FriendlyByteByf buf) {
+     *                  return new MyPacket(buf.readInt(), buf.readUtf());
+     *              }
+     *
+     *              public void encode(FriendlyByteBuf buf) {
+     *                  buf.writeInt(this.someInt);
+     *                  buf.writeUtf(this.someString);
+     *              }
+     *
+     *              public static PacketContext handle(MyPacket myPacketObj) {
+     *                  return (nullablePlayerOwner, currentLevel, currentSide) -> {
+     *                      // ... (Do stuff)
+     *                  }
+     *              }
+     *         }
+     *     }
+     * </pre>
+     *
+     * @param packet The wrapped packet object to register.
      *
      * @return The registered packet.
      *

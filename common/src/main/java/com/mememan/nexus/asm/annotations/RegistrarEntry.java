@@ -18,9 +18,14 @@ import java.lang.annotation.Target;
 public @interface RegistrarEntry {
 
     /**
+     * Determines the ordinal priority this annotation's owning {@code class} should be loaded by relative to other
+     * registrar entries.
+     * <br></br>
+     * By default, registrar entries are loaded lexicographically provided they share the same priority value with any
+     * other registrar class(es) AND that their {@link #dependencies()} are either empty or all loaded/initialized.
      *
-     *
-     * @return
+     * @return The priority value this annotation's owning {@code class} should be loaded by. Defaults to 0. Higher
+     * values are prioritized.
      */
     int priority() default 0;
 
