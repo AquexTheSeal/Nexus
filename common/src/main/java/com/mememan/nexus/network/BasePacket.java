@@ -18,9 +18,9 @@ import java.util.function.Function;
  *                      initial side.
  * @param packetDecoder The decoding method used to decode this packet's data from a {@link FriendlyByteBuf} on the
  *                      target side.
- * @param packetHandler The interface responsible for both representing the target side and handling this packet's data
- *                      on the target side, represented as a {@link Function} taking an input of the packet itself for
- *                      access to decoded packet data.
+ * @param packetHandler The {@code interface} responsible for both representing the target side and handling this
+ *                      packet's data on the target side, represented as a {@link Function} taking an input of the
+ *                      packet itself for access to decoded packet data.
  * @param targetSide The side this packet should be sent to.
  *
  * @param <MSGT> The class representing/containing this packet's data.
@@ -37,9 +37,9 @@ public record BasePacket<MSGT>(ResourceLocation packetId, Class<MSGT> packetClas
      *                      initial side.
      * @param packetDecoder The decoding method used to decode this packet's data from a {@link FriendlyByteBuf} on the
      *                      target side.
-     * @param packetHandler The interface responsible for both representing the target side and handling this packet's
-     *                      data on the target side, represented as a {@link Function} taking an input of the packet
-     *                      itself for access to decoded packet data.
+     * @param packetHandler The {@code interface} responsible for both representing the target side and handling this
+     *                      packet's data on the target side, represented as a {@link Function} taking an input of the
+     *                      packet itself for access to decoded packet data.
      * @param targetSide The side this packet should be sent to.
      */
     public BasePacket(String modId, Class<MSGT> packetClass, BiConsumer<MSGT, FriendlyByteBuf> packetEncoder, Function<FriendlyByteBuf, MSGT> packetDecoder, Function<MSGT, PacketContext> packetHandler, NetworkSide targetSide) {
