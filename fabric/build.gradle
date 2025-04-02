@@ -96,7 +96,8 @@ publishing {
             artifactId = base.archivesName.get()
             version = mod_version
 
-            from components.java
+            artifact jar
+            artifact sourcesJar
         }
     }
 }

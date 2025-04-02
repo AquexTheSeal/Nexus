@@ -147,7 +147,6 @@ publishing {
 
             artifact jar
             artifact sourcesJar
-            artifact javadocJar
         }
     }
 }
