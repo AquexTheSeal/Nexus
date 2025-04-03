@@ -1,5 +1,6 @@
 package com.mememan.nexus.asm.annotations;
 
+import com.mememan.nexus.asm.ClassFinder;
 import com.mememan.nexus.platform.services.Registrar;
 
 import java.lang.annotation.ElementType;
@@ -30,9 +31,15 @@ public @interface RegistrarEntry {
     int priority() default 0;
 
     /**
+     * Specifies an array of classes that should be statically initialized before this annotation's owning {@code class}
+     * is loaded/initialized.
+     * <br></br>
+     * Leaving this empty delegates the instantiation to {@link #priority()} and/or lexicographical ordering. Otherwise,
+     * the classes within this array get {@linkplain ClassFinder#forName(String) initialized} (with the same ordering
+     * logic) before this class is initialized.
      *
-     *
-     * @return
+     * @return An array of classes that should be statically initialized before this annotation's owning {@code class}
+     * is loaded/initialized.
      */
     Class[] dependencies() default {};
 }

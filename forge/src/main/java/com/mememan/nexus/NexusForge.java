@@ -6,6 +6,6 @@ import net.minecraftforge.fml.common.Mod;
 public class NexusForge {
     
     public NexusForge() {
-
+        Nexus.initialize();
     }
 }

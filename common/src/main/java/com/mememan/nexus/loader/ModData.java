@@ -15,6 +15,10 @@ import java.util.List;
  * <br></br>
  * It should be noted that loader-specific implementations of this {@code interface} cache all mod meta/data only once
  * during startup. Resource management and other later runtime-dependant tasks should therefore be handled elsewhere.
+ *
+ * @apiNote A {@link ModData} object may represent one mod instance, NOT to be confused with a whole JAR file. While 2
+ * {@link ModData} instances may share the same exact collection of file paths as part of the same JAR (uncommon but
+ * possible, as in the case of JiJ, for example), each instance holds its own unique metadata.
  */
 public interface ModData {
 

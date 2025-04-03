@@ -19,10 +19,20 @@ public final class ClassFinder {
      */
     public static Class<?> forName(String targetClassName) {
         try {
-            NexusConstants.LOGGER.debug("Loading Class: {}", targetClassName);
+            NexusConstants.LOGGER.debug("Loading & Initializing Class: {}", targetClassName);
             return Class.forName(targetClassName);
         } catch (ClassNotFoundException | ExceptionInInitializerError e) {
-            NexusConstants.LOGGER.error(e instanceof ClassNotFoundException ? "Failed to load: {}, no such class was found." : "Failed to initialize: {}", targetClassName, e);
+            NexusConstants.LOGGER.error(e instanceof ClassNotFoundException ? "Failed to load/initialize: {}, no such class was found." : "Failed to initialize: {}", targetClassName, e);
+            return null;
+        }
+    }
+
+    public static Class<?> forNameNoInit(String targetClassName) {
+        try {
+            NexusConstants.LOGGER.debug("Loading Class (No Initialization): {}", targetClassName);
+            return Class.forName(targetClassName, false, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException | ExceptionInInitializerError e) {
+            NexusConstants.LOGGER.error(e instanceof ClassNotFoundException ? "Failed to load: {}, no such class was found." : "Failed to load: {}", targetClassName, e);
             return null;
         }
     }

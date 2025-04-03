@@ -24,9 +24,14 @@ public interface NetworkManager {
      * Main method for this service interface, called in {@link Nexus} in order to load it and its loader-specific
      * implementations accordingly.
      * <br></br>
-     * Functionally speaking, all this method does is properly load {@link NetworkRegistrarEntry}-annotated classes.
+     * Functionally speaking, all this method does is properly load {@link NetworkRegistrarEntry}-annotated classes
+     * in lexicographical order.
      * <br></br>
      * Should <b>NOT</b> be called anywhere else!
+     *
+     * @apiNote Classloading order of annotated network registrar entries shouldn't necessarily matter, since packet
+     * registration is standalone. If you need any special functionality, you shouldn't be using the annotation to
+     * load your packet registrar class.
      */
     void setupNetworkHandler();
 
