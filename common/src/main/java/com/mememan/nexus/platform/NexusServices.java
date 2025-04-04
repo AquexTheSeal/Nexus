@@ -1,6 +1,7 @@
 package com.mememan.nexus.platform;
 
 import com.mememan.nexus.NexusConstants;
+import com.mememan.nexus.platform.services.NetworkManager;
 import com.mememan.nexus.platform.services.PlatformManager;
 
 import java.util.ServiceLoader;
@@ -27,7 +28,7 @@ public class NexusServices {
     /**
      * The service responsible for handling packet registration and interaction across sides (Client/Server).
      */
-  //  public static final NetworkManager NETWORK_MANAGER = loadService(NetworkManager.class);
+    public static final NetworkManager NETWORK_MANAGER = loadService(NetworkManager.class);
 
     /**
      * Internal service loader method for loading platform-agnostic services.

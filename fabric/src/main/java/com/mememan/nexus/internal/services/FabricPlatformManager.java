@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Fabric-specific implementation of {@link PlatformManager}.
+ */
 public class FabricPlatformManager implements PlatformManager {
     private static final FabricGamePathWrapper FABRIC_GAME_PATH_WRAPPER = new FabricGamePathWrapper();
     private static final ObjectOpenHashSet<ModData> MOD_DATA_CACHE = FabricLoader.getInstance().getAllMods().stream()

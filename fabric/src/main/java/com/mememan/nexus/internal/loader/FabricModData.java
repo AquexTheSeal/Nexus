@@ -92,8 +92,6 @@ public class FabricModData implements ModData {
 
         this.allFilePaths = mapAllFilePaths(ownerModContainer);
 
-
-
         long endTime = System.currentTimeMillis();
         long milliDuration = endTime - startTime;
 
