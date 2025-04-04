@@ -95,7 +95,7 @@ public interface PlatformManager {
 
     /**
      * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)}. Will scan for annotated classes from all
-     * mods.
+     * mods. Classes will be loaded lexicographically ({@link String#compareTo(String)}).
      *
      * @param annotationTypeClazz The annotation type class.
      *
