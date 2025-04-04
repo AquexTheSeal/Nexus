@@ -34,7 +34,7 @@ public interface ModData {
     ModMetadata getModMetadata();
 
     /**
-     * Caches/gets a {@link List} of every single formatted path within this instance's owning mod's JAR file on
+     * Gets a {@link List} of every single formatted path within this instance's owning mod's JAR file on
      * startup.
      * <br></br>
      * Mind that when using the word "formatted" in this case, it refers to paths that go something like
@@ -47,7 +47,7 @@ public interface ModData {
     List<String> getAllFilePaths();
 
     /**
-     * Overloaded variant of {@link #getAllFilePaths()} that caches/gets a lexicographically-sorted {@link List} of
+     * Overloaded variant of {@link #getAllFilePaths()} that computes/gets a lexicographically-sorted {@link List} of
      * all {@code class} files within this instance's owning mod's JAR file.
      *
      * @return A lexicographically-sorted {@link List} of all {@code class} files within this instance's owning mod's
