@@ -1,11 +1,13 @@
 package com.mememan.nexus.loader;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Data-holding {@code interface} representing metadata/file data pertaining to a given mod.
@@ -57,6 +59,16 @@ public interface ModData {
                 .sorted(String::compareTo)
                 .toList();
     }
+
+    /**
+     * Gets a {@link ConcurrentHashMap} of all (mod) classes that are annotated at all.
+     * <br></br>
+     * Note that this method gets the formatted paths of all annotated classes and their annotation keys, but does not
+     * load/initialize any of the classes or annotations themselves.
+     *
+     * @return A {@link ConcurrentHashMap} of all (mod) classes that have any annotations.
+     */
+    ConcurrentHashMap<String, ObjectArrayList<String>> getCachedAnnotatedClasses();
 
     /**
      * Discovers all (mod) classes that are annotated with the specified annotation type and compiles them into a

@@ -1,5 +1,8 @@
 package com.mememan.nexus.internal.loader;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.asm.ClassFinder;
 import com.mememan.nexus.loader.ModData;
@@ -8,6 +11,7 @@ import com.mememan.nexus.loader.ModSide;
 import cpw.mods.jarhandling.SecureJar;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.forgespi.language.IModInfo;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,14 +29,14 @@ import java.util.stream.Stream;
 /**
  * Forge-specific implementation of {@link ModData}.
  * <br></br>
- * Pre-emptively caches mod data on startup, using {@link IModInfo} as the backing source for mod meta/data. Additionally
- * handles mapping forge-specific metadata and logs general operations executed on object construction.
+ * Pre-emptively caches mod data on startup, using {@link IModInfo} as the backing source for mod meta/data. Additionally,
+ * handles mapping Forge-specific metadata and logs general operations executed on object construction.
  */
 public class ForgeModData implements ModData {
     private final IModInfo ownerModInfo;
     private final ModMetadata ownerModMetadata;
     private final ObjectArrayList<String> allFilePaths;
-    public final ConcurrentHashMap<String, ObjectArrayList<String>> cachedAnnotatedClasses = new ConcurrentHashMap<>(); // Stored as strings to avoid unnecessary classloading
+    private final ConcurrentHashMap<String, ObjectArrayList<String>> cachedAnnotatedClasses = new ConcurrentHashMap<>(); // Stored as strings to avoid unnecessary classloading
 
     public ForgeModData(IModInfo targetMod) {
         long startTime = System.currentTimeMillis();
@@ -41,10 +46,34 @@ public class ForgeModData implements ModData {
         String authorInput = targetMod.getConfig().<String>getConfigElement("authors")
                 .orElse(targetMod.getConfig().<String>getConfigElement("credits")
                         .orElse("None"));
+        ObjectArrayList<Triple<String, RangeSet<String>, Boolean>> dependencies = targetMod.getDependencies().isEmpty() ? ObjectArrayList.of() : targetMod.getDependencies().stream()
+                .map(curVersion -> { // More readable than inlining all of this
+                    RangeSet<String> depVersions = TreeRangeSet.create();
+
+                    if (!curVersion.getVersionRange().getRestrictions().isEmpty()) {
+                        if (curVersion.getVersionRange() == IModInfo.UNBOUNDED) depVersions.add(Range.all());
+                        else {
+                            curVersion.getVersionRange().getRestrictions().stream()
+                                    .map(curRestriction -> curRestriction.getLowerBound() == null && curRestriction.getUpperBound() == null
+                                            ? null
+                                            : curRestriction.getLowerBound() == null
+                                            ? Range.atMost(curRestriction.getUpperBound().toString())
+                                            : curRestriction.getUpperBound() == null
+                                            ? Range.atLeast(curRestriction.getLowerBound().toString())
+                                            : Range.closed(curRestriction.getLowerBound().toString(), curRestriction.getUpperBound().toString()))
+                                    .filter(Objects::nonNull)
+                                    .forEach(depVersions::add);
+                        }
+                    }
+
+                    return Triple.of(curVersion.getModId(), depVersions, curVersion.isMandatory());
+                })
+                .collect(Collectors.toCollection(ObjectArrayList::new));
 
         this.ownerModMetadata = new ModMetadata(targetMod.getModId(), targetMod.getDisplayName(),
                 targetMod.getVersion().getQualifier(), ownerModInfo.getOwningFile().getLicense(),
                 targetMod.getDescription(), ObjectArrayList.of(authorInput.contains(",") ? authorInput.split(",") : authorInput.split("\\s+")), // Really presumptuous split
+                dependencies,
                 targetMod.getConfig().<Boolean>getConfigElement("clientSideOnly").orElse(false)
                         ? ModSide.CLIENT
                         : ModSide.COMMON);
@@ -53,7 +82,7 @@ public class ForgeModData implements ModData {
         ownerModInfo.getOwningFile().getFile().getScanResult().getAnnotations().forEach(curAnnotData -> {
             cachedAnnotatedClasses.computeIfAbsent(
                             curAnnotData.annotationType().getClassName().replace('/', '.'),
-                            (ok) -> new ObjectArrayList<>())
+                            (oK) -> new ObjectArrayList<>())
                     .add(curAnnotData.clazz().getClassName().replace('/', '.'));
         });
 
@@ -68,7 +97,7 @@ public class ForgeModData implements ModData {
     }
 
     /**
-     * Repurposed variant of {@link SecureJar#getPackages()} that gets all file paths.
+     * Repurposed variant of {@link SecureJar#getPackages()} that gets all non-empty file paths.
      *
      * @param targetJar The {@link SecureJar} to index the paths of. Typically defaults to the owning JAR file of this
      *                  instance's {@link #ownerModInfo}
@@ -98,6 +127,11 @@ public class ForgeModData implements ModData {
     @Override
     public ObjectArrayList<String> getAllFilePaths() {
         return allFilePaths;
+    }
+
+    @Override
+    public ConcurrentHashMap<String, ObjectArrayList<String>> getCachedAnnotatedClasses() {
+        return cachedAnnotatedClasses;
     }
 
     @Override

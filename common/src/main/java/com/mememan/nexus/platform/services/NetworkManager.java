@@ -31,7 +31,7 @@ public interface NetworkManager {
      *
      * @apiNote Classloading order of annotated network registrar entries shouldn't necessarily matter, since packet
      * registration is standalone. If you need any special functionality, you shouldn't be using the annotation to
-     * load your packet registrar class.
+     * load your packet registrar class(es).
      */
     void setupNetworkHandler();
 

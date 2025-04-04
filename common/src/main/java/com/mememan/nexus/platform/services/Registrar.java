@@ -34,7 +34,7 @@ public interface Registrar {
      * handles loading all classes annotated with {@link RegistrarEntry}.
      * <br></br>
      * Dependant mods may choose to opt out of this auto-loading feature either by simply not annotating their classes
-     * with {@link RegistrarEntry}, or specifying so in the annotation's parameters.
+     * with {@link RegistrarEntry}.
      * <br></br>
      * Should <b>NOT</b> be called anywhere else!
      */
