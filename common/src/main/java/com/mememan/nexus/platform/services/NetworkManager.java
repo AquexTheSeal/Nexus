@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Loader-agnostic interface used for dynamically registering and sending cross-loader packets without needing multiple
@@ -33,6 +34,7 @@ public interface NetworkManager {
      * registration is standalone. If you need any special functionality, you shouldn't be using the annotation to
      * load your packet registrar class(es).
      */
+    @ApiStatus.Internal
     void setupNetworkHandler();
 
     /**

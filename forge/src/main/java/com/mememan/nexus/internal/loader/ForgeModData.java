@@ -100,7 +100,7 @@ public class ForgeModData implements ModData {
      * Repurposed variant of {@link SecureJar#getPackages()} that gets all non-empty file paths.
      *
      * @param targetJar The {@link SecureJar} to index the paths of. Typically defaults to the owning JAR file of this
-     *                  instance's {@link #ownerModInfo}
+     *                  instance's {@link #ownerModInfo}.
      *
      * @return A newly-computed {@link ObjectArrayList} of all formatted paths within a mod's {@link SecureJar} file, or
      * an empty {@link ObjectArrayList} if some exception is caught.

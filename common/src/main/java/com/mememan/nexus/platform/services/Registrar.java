@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -38,6 +39,7 @@ public interface Registrar {
      * <br></br>
      * Should <b>NOT</b> be called anywhere else!
      */
+    @ApiStatus.Internal
     void setupRegistrar();
 
     /**
