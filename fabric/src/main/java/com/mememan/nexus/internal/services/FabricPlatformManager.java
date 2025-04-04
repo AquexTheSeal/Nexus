@@ -6,6 +6,7 @@ import com.mememan.nexus.loader.GamePathWrapper;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModLoader;
 import com.mememan.nexus.platform.services.PlatformManager;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +40,10 @@ public class FabricPlatformManager implements PlatformManager {
 
     @Override
     public List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable List<String> validModIds) {
-        return List.of();
+        return MOD_DATA_CACHE.stream()
+                .filter(currentModData -> validModIds == null || validModIds.isEmpty() || validModIds.contains(currentModData.getModMetadata().modId()))
+                .flatMap(currentModData -> currentModData.discoverAnnotatedClasses(annotationTypeClazz, classLoadingSorter).stream())
+                .collect(Collectors.toCollection(ObjectArrayList::new));
     }
 
     @Override

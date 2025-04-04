@@ -60,7 +60,7 @@ public class ForgeModData implements ModData {
                                             ? Range.atMost(curRestriction.getUpperBound().toString())
                                             : curRestriction.getUpperBound() == null
                                             ? Range.atLeast(curRestriction.getLowerBound().toString())
-                                            : Range.closed(curRestriction.getLowerBound().toString(), curRestriction.getUpperBound().toString()))
+                                            : Range.closed(curRestriction.getLowerBound().toString(), curRestriction.getUpperBound().toString())) //TODO Maybe make this a tad more accurate in formatting brackets based on bound exclusivity
                                     .filter(Objects::nonNull)
                                     .forEach(depVersions::add);
                         }
