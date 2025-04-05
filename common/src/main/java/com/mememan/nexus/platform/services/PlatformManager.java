@@ -107,7 +107,7 @@ public interface PlatformManager {
      * Gets all loaded mods and converts them into their respective {@link ModData} representation before pooling them
      * into a {@link Set}. Different loaders have different implementations of {@link ModData}.
      * <br></br>
-     * This shouldn't have any major performance overhead. At its worst, it should only really add a few extra seconds
+     * This shouldn't have any major performance overhead. At its worst, it should only really add a few extra ms
      * to the game's startup time, and that's only on its first call when nothing's cached yet.
      *
      * @return A {@link Set} of all loaded mods, represented as {@link ModData} objects.
