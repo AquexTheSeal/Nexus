@@ -1,19 +1,24 @@
 package com.mememan.nexus.internal.services;
 
+import com.mememan.nexus.internal.FabricServerHooks;
 import com.mememan.nexus.internal.loader.FabricGamePathWrapper;
 import com.mememan.nexus.internal.loader.FabricModData;
+import com.mememan.nexus.loader.EnvironmentSide;
 import com.mememan.nexus.loader.GamePathWrapper;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModLoader;
 import com.mememan.nexus.platform.services.PlatformManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +28,7 @@ import java.util.stream.Collectors;
 public class FabricPlatformManager implements PlatformManager {
     private static final FabricGamePathWrapper FABRIC_GAME_PATH_WRAPPER = new FabricGamePathWrapper();
     private static final ObjectOpenHashSet<ModData> MOD_DATA_CACHE = FabricLoader.getInstance().getAllMods().stream()
+            .filter(curContainer -> !Objects.equals(curContainer.getMetadata().getId(), "minecraft")) // Fabric considers Minecraft to be a mod, which unnecessarily adds upwards of 1 minute to startup time
             .map(FabricModData::new)
             .collect(Collectors.toCollection(ObjectOpenHashSet::new));
 
@@ -57,5 +63,15 @@ public class FabricPlatformManager implements PlatformManager {
     @Override
     public GamePathWrapper getGamePathWrapper() {
         return FABRIC_GAME_PATH_WRAPPER;
+    }
+
+    @Override
+    public @Nullable MinecraftServer getCurrentServer() {
+        return FabricServerHooks.getCurrentServer();
+    }
+
+    @Override
+    public EnvironmentSide getEnvironmentSide() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? EnvironmentSide.CLIENT : EnvironmentSide.DEDICATED_SERVER;
     }
 }

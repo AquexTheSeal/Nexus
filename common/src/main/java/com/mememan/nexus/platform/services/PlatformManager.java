@@ -1,9 +1,7 @@
 package com.mememan.nexus.platform.services;
 
-import com.mememan.nexus.loader.EnvironmentType;
-import com.mememan.nexus.loader.GamePathWrapper;
-import com.mememan.nexus.loader.ModData;
-import com.mememan.nexus.loader.ModLoader;
+import com.mememan.nexus.loader.*;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -122,6 +120,25 @@ public interface PlatformManager {
      * @return The {@link GamePathWrapper} of the current platform.
      */
     GamePathWrapper getGamePathWrapper();
+
+    /**
+     * Gets the currently-running Minecraft server instance. May be {@code null} if the server isn't currently running
+     * on either side, or if the server is still at its early startup phase.
+     *
+     * @return The currently-running Minecraft server instance. May be {@code null}.
+     */
+    @Nullable
+    MinecraftServer getCurrentServer();
+
+    /**
+     * Gets the {@link EnvironmentSide} representation of the current side. This is essentially just a wrapper that
+     * determines the physical side you're working in.
+     *
+     * @return The {@link EnvironmentSide} representation of the current side.
+     *
+     * @see EnvironmentSide
+     */
+    EnvironmentSide getEnvironmentSide();
 
     /**
      * Gets the {@link EnvironmentType} representation of the current environment. This is an OOP'd variant of the

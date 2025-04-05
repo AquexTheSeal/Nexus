@@ -3,18 +3,22 @@ package com.mememan.nexus.internal.services;
 import com.mememan.nexus.asm.ClassFinder;
 import com.mememan.nexus.internal.loader.ForgeGamePathWrapper;
 import com.mememan.nexus.internal.loader.ForgeModData;
+import com.mememan.nexus.loader.EnvironmentSide;
 import com.mememan.nexus.loader.GamePathWrapper;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModLoader;
 import com.mememan.nexus.platform.services.PlatformManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 
@@ -81,5 +85,15 @@ public class ForgePlatformManager implements PlatformManager {
     @Override
     public GamePathWrapper getGamePathWrapper() {
         return FORGE_GAME_PATH_WRAPPER;
+    }
+
+    @Override
+    public @Nullable MinecraftServer getCurrentServer() {
+        return ServerLifecycleHooks.getCurrentServer();
+    }
+
+    @Override
+    public EnvironmentSide getEnvironmentSide() {
+        return FMLEnvironment.dist == Dist.CLIENT ? EnvironmentSide.CLIENT : EnvironmentSide.DEDICATED_SERVER;
     }
 }

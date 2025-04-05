@@ -48,7 +48,8 @@ public interface ModData {
 
     /**
      * Overloaded variant of {@link #getAllFilePaths()} that computes/gets a lexicographically-sorted {@link List} of
-     * all {@code class} files within this instance's owning mod's JAR file.
+     * all {@code class} files within this instance's owning mod's JAR file. Does not prune the {@code .class}
+     * extension.
      *
      * @return A lexicographically-sorted {@link List} of all {@code class} files within this instance's owning mod's
      * JAR file.

@@ -22,6 +22,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -41,8 +42,14 @@ public class ForgeNetworkManager implements NetworkManager {
     private static int PACKET_ID = 0;
 
     @Override
+    @ApiStatus.Internal
     public void setupNetworkHandler() {
+        long startTime = System.currentTimeMillis();
+
         NexusServices.PLATFORM_MANAGER.discoverAnnotatedClasses(NetworkRegistrarEntry.class);
+
+        long endTime = System.currentTimeMillis();
+        NexusConstants.LOGGER.info("Network manager setup took {} ms", endTime - startTime);
     }
 
     @Override

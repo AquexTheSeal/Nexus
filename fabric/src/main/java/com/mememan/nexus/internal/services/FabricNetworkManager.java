@@ -22,6 +22,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fabric-specific implementation of {@link NetworkManager}.
@@ -30,8 +31,14 @@ public class FabricNetworkManager implements NetworkManager {
     private static final Object2ObjectLinkedOpenHashMap<Class<?>, BasePacket<?>> MAPPED_PACKETS = new Object2ObjectLinkedOpenHashMap<>();
 
     @Override
+    @ApiStatus.Internal
     public void setupNetworkHandler() {
+        long startTime = System.currentTimeMillis();
+
         NexusServices.PLATFORM_MANAGER.discoverAnnotatedClasses(NetworkRegistrarEntry.class);
+
+        long endTime = System.currentTimeMillis();
+        NexusConstants.LOGGER.info("Network manager setup took {} ms", endTime - startTime);
     }
 
     @Override

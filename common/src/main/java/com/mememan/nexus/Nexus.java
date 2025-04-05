@@ -12,7 +12,7 @@ public class Nexus {
      * Central initialization method for Nexus API.
      */
     public static void initialize() {
-
+        NexusServices.REGISTRAR.setupRegistrar();
 
         if (NexusServices.PLATFORM_MANAGER.getPlatform().equals(ModLoader.FABRIC)) NexusServices.NETWORK_MANAGER.setupNetworkHandler();
     }

@@ -24,6 +24,64 @@ import java.util.function.Supplier;
  * <br></br>
  * Supports standard, datapack, and special vanilla registry types. Additionally covers custom registry types extending
  * from any of the 3 aforementioned types.
+ * <br></br>
+ * Dependant mods are responsible for storing their registered objects within their own collections. The average
+ * registrar {@code class} should look something like this:
+ * <pre>
+ *     {@code
+ *          @RegistrarEntry // Optional, you can use bootstrap methods or some other way to statically initialize this class
+ *          public class MyModBlocks {
+ *              private static final ObjectArrayList<Supplier<Block>> BLOCKS = new ObjectArrayList<>(); // Collection type can vary based on your use-case, but this is generally how you'd do it for a standard registry
+ *              private static final ObjectArrayList<Supplier<Item>> BLOCK_ITEMS = new ObjectArrayList<>(); // If your blocks are going to have their own items, you should also store those separately
+ *
+ *              public static final Supplier<Block> EXAMPLE_BLOCK = BlockPropertyWrapper.of(BlockPropertyWrappers.BASIC_BLOCK, registerBlock())
+ *                  .cachedBuilder()
+ *                  .withParentCreativeModeTab(YourCMTRegistrarClass.YOUR_BLOCK_TAB)
+ *                  .build()
+ *                  .getParentBlock();
+ *
+ *              // All methods below are optional; you can register your objects however you want so long as you're ordering everything correctly (Not attempting to access objects before they're registered via NexusServices.REGISTRAR.registerObject(...), etc.)
+ *              // Nexus API offers shortcut utility methods that allow for flexibility based on your needs inside of the com.mememan.nexus.template subpackages
+ *
+ *              private static Supplier<Block> registerBlock(String id, Supplier<Block> blockSup, Item.Properties blockItemProperties) {
+ *                  Supplier<Block> registeredBlock = registerItemlessBlock(id, blockSup);
+ *                  registerBlockItem(id, () -> new BlockItem(registeredBlock.get(), blockItemProperties));
+ *                  return registeredBlock;
+ *              }
+ *
+ *              private static Supplier<Block> registerBlock(String id, Supplier<Block> blockSup, Supplier<Item> itemSup) {
+ *                  Supplier<Block> registeredBlock = registerItemlessBlock(id, blockSup);
+ *                  registerBlockItem(id, itemSup);
+ *                  return registeredBlock;
+ *              }
+ *
+ *              private static Supplier<Block> registerItemlessBlock(String id, Supplier<Block> blockSup) {
+ *                  Supplier<Block> registeredBlockSup = CAServices.REGISTRAR.registerObject(CAConstants.prefix(id), blockSup, BuiltInRegistries.BLOCK); // Otherwise reference to the block sup is null cuz it needs to be registered beforehand
+ *                  BLOCKS.add(registeredBlockSup);
+ *                  return registeredBlockSup;
+ *              }
+ *
+ *              private static Supplier<Item> registerBlockItem(String id, Supplier<Item> itemSup) {
+ *                  Supplier<Item> registeredItemSup = CAServices.REGISTRAR.registerObject(CAConstants.prefix(id), itemSup, BuiltInRegistries.ITEM); // Otherwise reference to the item sup is null cuz it needs to be registered beforehand
+ *                  BLOCK_ITEMS.add(registeredItemSup);
+ *                  return registeredItemSup;
+ *              }
+ *
+ *              // You would typically only want others to have read-only access to your registered objects
+ *              // Note that others modifying your custom collections won't actually affect objects you've registered to the game (I.E. If they, for instance, try BLOCKS.remove(EXAMPLE_BLOCK), it won't actually remove the block from the game)
+ *
+ *              public static ImmutableList<Supplier<Block>> getBlocks() {
+ *                  return BLOCKS;
+ *              }
+ *
+ *              public static ImmutableList<Supplier<Item>> getBlockItems() {
+ *                  return BLOCK_ITEMS;
+ *              }
+ *          }
+ *     }
+ * </pre>
+ *
+ * For more information, see the references below.
  */
 public interface Registrar {
 
@@ -35,7 +93,8 @@ public interface Registrar {
      * handles loading all classes annotated with {@link RegistrarEntry}.
      * <br></br>
      * Dependant mods may choose to opt out of this auto-loading feature either by simply not annotating their classes
-     * with {@link RegistrarEntry}.
+     * with {@link RegistrarEntry}. It should, however, be noted that mods not using this annotation will have to
+     * statically-initialize their classes in some way (bootstrap methods, custom annotation discovery, etc.).
      * <br></br>
      * Should <b>NOT</b> be called anywhere else!
      */
@@ -51,8 +110,8 @@ public interface Registrar {
      * @param objId The id of the object to register, following Minecraft's regex naming conventions/constraints
      *              (<code>[a-z0-9_.-]</code>). Duplicate exceptions and other edge-cases are handled accordingly
      *              within the target mod-loader's registry implementation.
-     * @param objSup The object to register. Has to be valid (e.g. not null, matching the target registry's type, etc.)
-     *               for the target registry.
+     * @param objSup The object to register. Has to be valid (e.g. non-{@code null}, matching the target registry's
+     *               type, etc.) for the target registry.
      * @param targetRegistry The target {@link Registry} to register the specified object to.
      *
      * @return The <code>objSup</code> that was registered.

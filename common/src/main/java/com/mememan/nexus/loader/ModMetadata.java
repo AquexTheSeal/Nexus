@@ -18,7 +18,7 @@ import java.util.List;
  * @param modDescription The mod's description. Usually a multi-line string.
  * @param modAuthors The mod's authors. May be empty if none are defined.
  * @param modDependencies The mod's dependencies, represented as a {@link List} of {@linkplain Triple Triples}
- *                        comprised of the dependency's mod ID, version range, and whether the dependency is required.
+ *                        comprised of the dependency's mod ID, version range(s), and whether the dependency is required.
  *                        May be empty if none are defined. The {@link RangeSet} here may be unbounded/empty.
  * @param modSide The mod's target environment side.
  *
