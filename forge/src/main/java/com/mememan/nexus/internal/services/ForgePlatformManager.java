@@ -52,11 +52,13 @@ public class ForgePlatformManager implements PlatformManager {
 
     @Override
     public List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable List<String> validModIds) {
+        Type targetAnnotType = Type.getType(annotationTypeClazz); // Micro-optimization: Cache the annotation class' type in a local field
+
         if (validModIds == null || validModIds.isEmpty() || validModIds.stream().noneMatch(curModId -> ModList.get().isLoaded(curModId))) {
             return ModList.get().getAllScanData().stream()
                     .map(ModFileScanData::getAnnotations)
                     .flatMap(Collection::stream)
-                    .filter(annotationData -> Objects.equals(annotationData.annotationType(), Type.getType(annotationTypeClazz)))
+                    .filter(annotationData -> Objects.equals(annotationData.annotationType(), targetAnnotType))
                     .map(ModFileScanData.AnnotationData::clazz)
                     .map(Type::getClassName)
                     .sorted(classLoadingSorter != null ? classLoadingSorter : String::compareTo)
@@ -69,7 +71,7 @@ public class ForgePlatformManager implements PlatformManager {
                 .map(IModFile::getScanResult)
                 .map(ModFileScanData::getAnnotations)
                 .flatMap(Collection::stream)
-                .filter(annotationData -> Objects.equals(annotationData.annotationType(), Type.getType(annotationTypeClazz)))
+                .filter(annotationData -> Objects.equals(annotationData.annotationType(), targetAnnotType))
                 .map(ModFileScanData.AnnotationData::clazz)
                 .map(Type::getClassName)
                 .sorted(classLoadingSorter != null ? classLoadingSorter : String::compareTo)

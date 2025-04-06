@@ -26,7 +26,7 @@ public @interface RegistrarEntry {
      * other registrar class(es) AND that their {@link #dependencies()} are either empty or all loaded/initialized.
      *
      * @return The priority value this annotation's owning {@code class} should be loaded by. Defaults to 0. Higher
-     * values are prioritized.
+     * values are initialized first.
      */
     int priority() default 0;
 

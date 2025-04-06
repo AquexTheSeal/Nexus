@@ -216,7 +216,9 @@ public class FabricModData implements ModData {
 
     @Override
     public List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter) {
-        return cachedAnnotatedClasses.get(annotationTypeClazz.getName()) == null ? ObjectArrayList.of() : cachedAnnotatedClasses.get(annotationTypeClazz.getName())
+        String formattedAnnotationName = "L" + annotationTypeClazz.getName().replace('.', '/') + ";";
+
+        return cachedAnnotatedClasses.get(formattedAnnotationName) == null ? ObjectArrayList.of() : cachedAnnotatedClasses.get(formattedAnnotationName)
                 .stream()
                 .sorted(classLoadingSorter != null ? classLoadingSorter : String::compareTo)
                 .map(ClassFinder::forName)

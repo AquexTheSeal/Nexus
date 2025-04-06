@@ -94,7 +94,8 @@ public interface Registrar {
      * <br></br>
      * Dependant mods may choose to opt out of this auto-loading feature either by simply not annotating their classes
      * with {@link RegistrarEntry}. It should, however, be noted that mods not using this annotation will have to
-     * statically-initialize their classes in some way (bootstrap methods, custom annotation discovery, etc.).
+     * statically-initialize their classes in some way (bootstrap methods, custom annotation discovery, etc.) in order
+     * for object registration to actually occur.
      * <br></br>
      * Should <b>NOT</b> be called anywhere else!
      */
