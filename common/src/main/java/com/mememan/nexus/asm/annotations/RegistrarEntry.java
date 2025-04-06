@@ -32,14 +32,16 @@ public @interface RegistrarEntry {
 
     /**
      * Specifies an array of classes that should be statically initialized before this annotation's owning {@code class}
-     * is loaded/initialized.
+     * is initialized.
      * <br></br>
      * Leaving this empty delegates the instantiation to {@link #priority()} and/or lexicographical ordering. Otherwise,
-     * the classes within this array get {@linkplain ClassFinder#forName(String) initialized} (with the same ordering
-     * logic) before this class is initialized.
+     * the classes within this array get {@linkplain ClassFinder#forName(String) initialized} before this annotation's
+     * owning {@code class} is initialized.
+     * <br></br>
+     * Dependency classes will be initialized in the order they're declared in this array.
      *
      * @return An array of classes that should be statically initialized before this annotation's owning {@code class}
-     * is loaded/initialized.
+     * is initialized.
      *
      * @apiNote {@code SomeClass.class} loads classes into memory, but it does not initialize them. All this parameter
      * does is ensure that these classes are initialized before this annotation's owning class is initialized.
