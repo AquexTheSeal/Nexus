@@ -13,9 +13,9 @@ public final class ClassFinder {
     /**
      * A utility method that wraps {@link Class#forName(String)} in a {@code try-catch} block.
      *
-     * @param targetClassName The name of the class to load.
+     * @param targetClassName The name of the {@code class} to load.
      *
-     * @return The loaded class, or {@code null} if no such class exists.
+     * @return The loaded {@code class}, or {@code null} if no such {@code class} exists/an exception is caught.
      */
     public static Class<?> forName(String targetClassName) {
         try {
@@ -27,6 +27,13 @@ public final class ClassFinder {
         }
     }
 
+    /**
+     * Loads the specified {@code class} without initializing it.
+     *
+     * @param targetClassName The name of the {@code class} to load.
+     *
+     * @return The loaded {@code class}, or {@code null} if no such {@code class} exists/an exception is caught.
+     */
     public static Class<?> forNameNoInit(String targetClassName) {
         try {
             NexusConstants.LOGGER.debug("Loading Class (No Initialization): {}", targetClassName);
