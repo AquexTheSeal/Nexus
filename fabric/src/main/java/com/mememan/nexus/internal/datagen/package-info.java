@@ -3,6 +3,6 @@
  * {@link com.mememan.nexus.platform.NexusServices#DATA_GENERATOR} for proper access and registration.
  */
 @ApiStatus.Internal
-package com.mememan.nexus.datagen;
+package com.mememan.nexus.internal.datagen;
 
 import org.jetbrains.annotations.ApiStatus;

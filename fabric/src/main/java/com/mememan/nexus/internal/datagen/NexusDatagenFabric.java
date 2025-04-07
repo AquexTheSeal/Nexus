@@ -1,4 +1,4 @@
-package com.mememan.nexus.datagen;
+package com.mememan.nexus.internal.datagen;
 
 import com.mememan.nexus.NexusConstants;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;

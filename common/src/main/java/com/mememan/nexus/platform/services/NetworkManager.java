@@ -79,7 +79,7 @@ public interface NetworkManager {
      *              }
      *
      *              public static PacketContext handle(MyPacket myPacketObj) {
-     *                  return (nullablePlayerOwner, currentLevel, currentSide) -> {
+     *                  return (nullablePlayerOwner, currentLevel, currentConnection, currentSide) -> {
      *                      // ... (Do stuff)
      *                  }
      *              }
