@@ -14,7 +14,7 @@ public class Nexus {
     public static void initialize() {
         NexusServices.REGISTRAR.setupRegistrar();
 
-        if (NexusServices.PLATFORM_MANAGER.getPlatform().equals(ModLoader.FABRIC)) NexusServices.NETWORK_MANAGER.setupNetworkHandler();
+        if (NexusServices.PLATFORM_MANAGER.getPlatform().equals(ModLoader.FABRIC)) NexusServices.NETWORK_MANAGER.setupNetworkManager();
     }
 
     /**
@@ -22,6 +22,6 @@ public class Nexus {
      * Neo/Forge.
      */
     public static void initializeDeferred() {
-        NexusServices.NETWORK_MANAGER.setupNetworkHandler();
+        NexusServices.NETWORK_MANAGER.setupNetworkManager();
     }
 }

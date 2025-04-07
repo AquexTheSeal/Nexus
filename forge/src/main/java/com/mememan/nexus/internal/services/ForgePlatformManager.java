@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.language.IModFileInfo;
@@ -99,6 +100,11 @@ public class ForgePlatformManager implements PlatformManager {
     @Override
     public @Nullable MinecraftServer getCurrentServer() {
         return ServerLifecycleHooks.getCurrentServer();
+    }
+
+    @Override
+    public boolean isRunningDataGen() {
+        return DatagenModLoader.isRunningDataGen();
     }
 
     @Override

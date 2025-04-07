@@ -43,7 +43,7 @@ public class ForgeNetworkManager implements NetworkManager {
 
     @Override
     @ApiStatus.Internal
-    public void setupNetworkHandler() {
+    public void setupNetworkManager() {
         long startTime = System.currentTimeMillis();
 
         NexusServices.PLATFORM_MANAGER.discoverAnnotatedClasses(NetworkRegistrarEntry.class);

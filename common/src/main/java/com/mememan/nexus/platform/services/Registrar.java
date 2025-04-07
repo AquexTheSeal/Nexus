@@ -67,7 +67,7 @@ import java.util.function.Supplier;
  *                  return registeredItemSup;
  *              }
  *
- *              // You would typically only want others to have read-only access to your registered objects
+ *              // You would typically want others to have read-only access to your registered objects
  *              // Note that others modifying your custom collections won't actually affect objects you've registered to the game (I.E. If they, for instance, try BLOCKS.remove(EXAMPLE_BLOCK), it won't actually remove the block from the game)
  *
  *              public static ImmutableList<Supplier<Block>> getBlocks() {

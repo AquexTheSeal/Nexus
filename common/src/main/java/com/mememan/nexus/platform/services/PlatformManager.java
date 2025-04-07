@@ -181,6 +181,13 @@ public interface PlatformManager {
     MinecraftServer getCurrentServer();
 
     /**
+     * Whether the current loader is running data generation. Only really useful in the development environment.
+     *
+     * @return Whether the current loader is running data generation.
+     */
+    boolean isRunningDataGen();
+
+    /**
      * Gets the {@link EnvironmentSide} representation of the current side. This is essentially just a wrapper that
      * determines the physical side you're working in.
      *

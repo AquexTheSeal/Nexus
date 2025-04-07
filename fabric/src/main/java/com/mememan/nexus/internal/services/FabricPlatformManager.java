@@ -11,6 +11,7 @@ import com.mememan.nexus.platform.services.PlatformManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
@@ -69,6 +70,11 @@ public class FabricPlatformManager implements PlatformManager {
     @Override
     public @Nullable MinecraftServer getCurrentServer() {
         return FabricServerHooks.getCurrentServer();
+    }
+
+    @Override
+    public boolean isRunningDataGen() {
+        return FabricDataGenHelper.ENABLED;
     }
 
     @Override

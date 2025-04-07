@@ -35,7 +35,7 @@ public interface NetworkManager {
      * load your packet registrar class(es).
      */
     @ApiStatus.Internal
-    void setupNetworkHandler();
+    void setupNetworkManager();
 
     /**
      * Method for registering S2C/C2S packets (based on the provided {@linkplain BasePacket BasePacket's}
