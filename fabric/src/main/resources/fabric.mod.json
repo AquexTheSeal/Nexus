@@ -22,7 +22,7 @@
         "client": [
             "${fabric_client_entrypoint}"
         ],
-        "data": [
+        "fabric-datagen": [
             "${fabric_datagen_entrypoint}"
         ]
     },

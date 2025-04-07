@@ -5,17 +5,17 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod(NexusConstants.MOD_ID)
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NexusForge {
-    
+
     public NexusForge() {
         Nexus.initialize();
     }
 
     @SubscribeEvent
     public static void onFMLCommonSetupEvent(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() ->
-                Nexus.initializeDeferred()
-        );
+        event.enqueueWork(() -> {
+            Nexus.initializeDeferred();
+        });
     }
 }

@@ -7,6 +7,7 @@ import com.mememan.nexus.network.BasePacket;
 import com.mememan.nexus.network.NetworkSide;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.NetworkManager;
+import com.mememan.nexus.util.ClientUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -53,15 +54,15 @@ public class FabricNetworkManager implements NetworkManager {
 
         if (targetSide.equals(NetworkSide.C2S)) {
             ServerPlayNetworking.registerGlobalReceiver(packet.packetId(), ((targetServer, playerReceiver, serverPacketListener, buf, fabricPacketSender) -> {
-                buf.readByte(); // Forge discriminator handling (monke see monke do)
+                buf.readByte(); // Forge discriminator handling
 
-                packet.packetHandler().apply(packet.packetDecoder().apply(buf)).handlePacket(playerReceiver, targetServer.getLevel(playerReceiver.level().dimension()), NetworkSide.C2S);
+                packet.packetHandler().apply(packet.packetDecoder().apply(buf)).handlePacket(playerReceiver, targetServer.getLevel(playerReceiver.level().dimension()), serverPacketListener.connection, NetworkSide.C2S);
             }));
         } else if (targetSide.equals(NetworkSide.S2C)) {
             ClientPlayNetworking.registerGlobalReceiver(packet.packetId(), ((targetClient, clientPacketListener, buf, fabricPacketSender) -> {
-                buf.readByte(); // Forge discriminator handling (monke see monke do)
+                buf.readByte();
 
-                packet.packetHandler().apply(packet.packetDecoder().apply(buf)).handlePacket(targetClient.player, targetClient.level, NetworkSide.S2C);
+                packet.packetHandler().apply(packet.packetDecoder().apply(buf)).handlePacket(ClientUtil.getClientPlayer(), ClientUtil.getClientLevel(), clientPacketListener.getConnection(), NetworkSide.S2C);
             }));
         }
         return packet;

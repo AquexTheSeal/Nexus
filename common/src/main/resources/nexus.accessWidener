@@ -91,3 +91,6 @@ accessible method net/minecraft/data/worldgen/TerrainProvider calculateMountainR
 
 # HierarchicalModel
 accessible field net/minecraft/client/model/HierarchicalModel ANIMATION_VECTOR_CACHE Lorg/joml/Vector3f;
+
+# ServerGamePacketListenerImpl
+accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;

@@ -7,8 +7,8 @@ import com.mememan.nexus.network.NetworkSide;
 import com.mememan.nexus.network.PacketContext;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.NetworkManager;
+import com.mememan.nexus.util.ClientUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -110,10 +110,10 @@ public class ForgeNetworkManager implements NetworkManager {
                 ServerPlayer playerSender = ctx.get().getSender();
 
                 handler.apply(msg).handlePacket(playerSender == null
-                        ? Minecraft.getInstance().player
+                        ? ClientUtil.getClientPlayer()
                         : playerSender, playerSender == null
-                        ? LogicalSidedProvider.CLIENTWORLD.get(curSide).filter(ClientLevel.class::isInstance).orElse(Minecraft.getInstance().level)
-                        : playerSender.serverLevel(), curSide.isServer()
+                        ? LogicalSidedProvider.CLIENTWORLD.get(curSide).orElse(ClientUtil.getClientLevel())
+                        : playerSender.serverLevel(), ctx.get().getNetworkManager(), curSide.isServer()
                         ? NetworkSide.C2S
                         : NetworkSide.S2C);
             });

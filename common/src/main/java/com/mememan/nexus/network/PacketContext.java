@@ -1,9 +1,12 @@
 package com.mememan.nexus.network;
 
+import com.mememan.nexus.util.ClientUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,10 +21,12 @@ public interface PacketContext {
      * @param packetHandler The {@link ServerPlayer} responsible for sending this packet (basically the target on the
      *                      receiving side), if it was C2S. Is otherwise {@link Minecraft#player}. May be {@code null},
      *                      so make sure to add nullity checks, <b>particularly if you're on the client</b>. Should
-     *                      usually return the client player otherwise (see {@link Minecraft#player}).
+     *                      usually return the client player otherwise (see {@link ClientUtil#getClientPlayer()}).
      * @param curLevel The current {@link Level} in which this packet is being processed, I.E. the {@link Level} on the
      *                 target {@link NetworkSide}.
+     * @param curConnection The current active {@link Connection} responsible for handling this packet within its
+     *                      channel.
      * @param curSide The {@link NetworkSide} on which this packet has been received/is being processed.
      */
-    void handlePacket(@Nullable Player packetHandler, Level curLevel, NetworkSide curSide);
+    void handlePacket(@Nullable Player packetHandler, Level curLevel, @NotNull Connection curConnection, NetworkSide curSide);
 }
