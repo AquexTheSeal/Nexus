@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * Central internal implementation for datagen on Fabric. This is where
  * {@link com.mememan.nexus.internal.services.FabricDataGenerator} delegates its work.
  */
-public class NexusDatagenFabric implements DataGeneratorEntrypoint {
+public class NexusDataGenFabric implements DataGeneratorEntrypoint {
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
