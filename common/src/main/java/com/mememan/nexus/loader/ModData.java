@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Data-holding {@code interface} representing metadata/file data pertaining to a given mod.
@@ -78,6 +79,8 @@ public interface ModData {
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
      *                           <b>before</b> loading them. May be {@code null}.
+     * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
+     *                                be {@code null}.
      *
      * @return A {@link List} of (loaded) classes within this instance's owning mod annotated with the specified
      * annotation type. May be empty.
@@ -86,5 +89,20 @@ public interface ModData {
      * and the likes is that each loader may have a more efficient/direct way of accessing and filtering class files
      * accordingly.
      */
-    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter);
+    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable Consumer<String> beforeClassInitConsumer);
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, Consumer)} without any pre-initialization
+     * operations.
+     *
+     * @param annotationTypeClazz The annotation type class.
+     * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
+     *                           <b>before</b> loading them. May be {@code null}.
+     *
+     * @return A {@link List} of (loaded) classes within this instance's owning mod annotated with the specified
+     * annotation type. May be empty.
+     */
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter) {
+        return discoverAnnotatedClasses(annotationTypeClazz, classLoadingSorter, null);
+    }
 }

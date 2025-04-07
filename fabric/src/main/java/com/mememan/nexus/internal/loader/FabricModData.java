@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -215,12 +216,15 @@ public class FabricModData implements ModData {
     }
 
     @Override
-    public List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter) {
+    public List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable Consumer<String> beforeClassInitConsumer) {
         String formattedAnnotationName = "L" + annotationTypeClazz.getName().replace('.', '/') + ";";
 
         return cachedAnnotatedClasses.get(formattedAnnotationName) == null ? ObjectArrayList.of() : cachedAnnotatedClasses.get(formattedAnnotationName)
                 .stream()
                 .sorted(classLoadingSorter != null ? classLoadingSorter : String::compareTo)
+                .peek(name -> {
+                    if (beforeClassInitConsumer != null) beforeClassInitConsumer.accept(name);
+                })
                 .map(ClassFinder::forName)
                 .collect(Collectors.toCollection(ObjectArrayList::new));
     }

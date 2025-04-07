@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * A loader-agnostic {@code interface} for managing platform-specific implementations of certain loader-specific
@@ -54,6 +55,8 @@ public interface PlatformManager {
      *                           <b>before</b> loading them. May be {@code null}.
      * @param validModIds An optional whitelist of valid mod IDs to scan for annotated classes. Leaving this empty or
      *                    {@code null} will result in a scan for annotated classes from all mods.
+     * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
+     *                                be {@code null}.
      *
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      *
@@ -61,11 +64,27 @@ public interface PlatformManager {
      * corresponding annotated classes are loaded, this method will simply compute and return the same result without
      * actually doing anything to the already loaded classes.
      */
-    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable List<String> validModIds);
+    List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable List<String> validModIds, @Nullable Consumer<String> beforeClassInitConsumer);
 
     /**
-     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)} that uses the default
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List, Consumer)} that uses the default
      * {@link String#compareTo(String)} comparator for sorting.
+     *
+     * @param annotationTypeClazz The annotation type class.
+     * @param validModIds An optional whitelist of valid mod IDs to scan for annotated classes. Leaving this empty or
+     *                    {@code null} will result in a scan for annotated classes from all mods.
+     * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
+     *                                be {@code null}.
+     *
+     * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
+     */
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable List<String> validModIds, Consumer<String> beforeClassInitConsumer) {
+        return discoverAnnotatedClasses(annotationTypeClazz, String::compareTo, validModIds, beforeClassInitConsumer);
+    }
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, List, Consumer)} without any pre-initialization
+     * tasks.
      *
      * @param annotationTypeClazz The annotation type class.
      * @param validModIds An optional whitelist of valid mod IDs to scan for annotated classes. Leaving this empty or
@@ -74,12 +93,28 @@ public interface PlatformManager {
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      */
     default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable List<String> validModIds) {
-        return discoverAnnotatedClasses(annotationTypeClazz, String::compareTo, validModIds);
+        return discoverAnnotatedClasses(annotationTypeClazz, validModIds, null);
     }
 
     /**
-     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)}. Will scan for annotated classes
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List, Consumer)}. Will scan for annotated classes
      * from all mods.
+     *
+     * @param annotationTypeClazz The annotation type class.
+     * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
+     *                           <b>before</b> loading them. May be {@code null}.
+     * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
+     *                                be {@code null}.
+     *
+     * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
+     */
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Comparator<String> classLoadingSorter, @Nullable Consumer<String> beforeClassInitConsumer) {
+        return discoverAnnotatedClasses(annotationTypeClazz, classLoadingSorter, null, beforeClassInitConsumer);
+    }
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, Consumer)} without any pre-initialization
+     * tasks.
      *
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
@@ -92,15 +127,30 @@ public interface PlatformManager {
     }
 
     /**
-     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List)}. Will scan for annotated classes from all
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List, Consumer)}. Will scan for annotated classes from all
      * mods. Classes will be loaded lexicographically ({@link String#compareTo(String)}).
+     *
+     * @param annotationTypeClazz The annotation type class.
+     * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
+     *                                be {@code null}.
+     *
+     * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
+     */
+    default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz, @Nullable Consumer<String> beforeClassInitConsumer) {
+        return discoverAnnotatedClasses(annotationTypeClazz, null, null, beforeClassInitConsumer);
+    }
+
+    /**
+     * Overloaded variant of {@link #discoverAnnotatedClasses(Class, Comparator, List, Consumer)}. Will scan for
+     * annotated classes from all mods. Classes will be loaded lexicographically ({@link String#compareTo(String)})
+     * without any pre-initialization tasks.
      *
      * @param annotationTypeClazz The annotation type class.
      *
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      */
     default List<Class<?>> discoverAnnotatedClasses(Class<? extends Annotation> annotationTypeClazz) {
-        return discoverAnnotatedClasses(annotationTypeClazz, null, null);
+        return discoverAnnotatedClasses(annotationTypeClazz, null, null, null);
     }
 
     /**

@@ -71,7 +71,7 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run-data')
+            workingDirectory project.file('run/datagen')
             ideaModule "${rootProject.name}.${project.name}.main"
 
             taskName "${forge_data_taskname}"

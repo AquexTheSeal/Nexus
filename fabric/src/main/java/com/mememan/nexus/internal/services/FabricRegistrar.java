@@ -35,31 +35,24 @@ public class FabricRegistrar implements Registrar {
             RegistrarEntry annotB = uninitializedClassB.getAnnotation(RegistrarEntry.class);
             int priorityA = annotA.priority();
             int priorityB = annotB.priority();
-            Class[] dependenciesForA = annotA.dependencies();
-            Class[] dependenciesForB = annotB.dependencies();
-
-
-            if (dependenciesForA != null) {
-                for (Class dependency : dependenciesForA) {
-                    if (dependency == null || dependency.getName().equals(classA)) continue;
-
-                    ClassFinder.forName(dependency.getName());
-                }
-            }
-
-            if (dependenciesForB != null) {
-                for (Class dependency : dependenciesForB) {
-                    if (dependency == null || dependency.getName().equals(classB)) continue;
-
-                    ClassFinder.forName(dependency.getName());
-                }
-            }
 
             return priorityA > priorityB
                     ? -1
                     : priorityA == priorityB
                     ? classA.compareTo(classB)
                     : 1;
+        }, (sortedClassName) -> {
+            Class<?> uninitializedTargetClass = ClassFinder.forNameNoInit(sortedClassName);
+            RegistrarEntry targetAnnotation = uninitializedTargetClass.getAnnotation(RegistrarEntry.class);
+            Class<?>[] dependencies = targetAnnotation.dependencies();
+
+            if (dependencies != null) {
+                for (Class<?> dependency : dependencies) {
+                    if (dependency == null || dependency.getName().equals(sortedClassName)) continue;
+
+                    ClassFinder.forName(dependency.getName());
+                }
+            }
         });
 
         CACHED_DATAPACK_OBJECT_ENTRIES.asMap().forEach((registryKey, objSupMappingFuncs) -> {
