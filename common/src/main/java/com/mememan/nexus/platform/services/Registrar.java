@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Loader-agnostic interface used for dynamically delegating object registration without needing multiple
+ * A loader-agnostic {@code interface} used for dynamically delegating object registration without needing multiple
  * separate methods, classes, or redundant loader-specific setup.
  * <br></br>
  * Supports standard, datapack, and special vanilla registry types. Additionally covers custom registry types extending

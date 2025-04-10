@@ -14,8 +14,8 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Loader-agnostic interface used for dynamically registering and sending cross-loader packets without needing multiple
- * separate methods, classes, or redundant loader-specific setup.
+ * A loader-agnostic {@code interface} used for dynamically registering and sending cross-loader packets without needing
+ * multiple separate methods, classes, or redundant loader-specific setup.
  *
  * @see BasePacket
  */

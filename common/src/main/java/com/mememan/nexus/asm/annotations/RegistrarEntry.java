@@ -44,7 +44,7 @@ public @interface RegistrarEntry {
      * is initialized.
      *
      * @apiNote {@code SomeClass.class} loads classes into memory, but it does not initialize them. All this parameter
-     * does is ensure that these classes are initialized before this annotation's owning class is initialized.
+     * does is ensure that these classes are initialized before this annotation's owning {@code class} is initialized.
      *
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-12.html#jls-12.4.1">
      *     When Initialization Occurs (JLS)</a>

@@ -19,6 +19,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -32,6 +33,7 @@ public class ForgeRegistrar implements Registrar {
     private static RegistrySetBuilder DATAPACK_REGISTRY_SET_BUILDER;
 
     @Override
+    @ApiStatus.Internal
     public void setupRegistrar() {
         long startTime = System.currentTimeMillis();
 

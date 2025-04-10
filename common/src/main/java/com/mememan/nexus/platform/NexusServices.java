@@ -30,6 +30,10 @@ public class NexusServices {
      * The service responsible for handling packet registration and interaction across sides (Client/Server).
      */
     public static final NetworkManager NETWORK_MANAGER = loadService(NetworkManager.class);
+    /**
+     * The service responsible for registering and handling all data generation providers/tasks for dependant mods.
+     */
+ //   public static final DataGenerator DATA_GENERATOR = loadService(DataGenerator.class);
 
     /**
      * Internal service loader method for loading platform-agnostic services.

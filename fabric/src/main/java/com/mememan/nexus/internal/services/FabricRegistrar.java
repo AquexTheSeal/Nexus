@@ -13,6 +13,7 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -25,6 +26,7 @@ public class FabricRegistrar implements Registrar {
     private static RegistrySetBuilder DATAPACK_REGISTRY_SET_BUILDER;
 
     @Override
+    @ApiStatus.Internal
     public void setupRegistrar() {
         long startTime = System.currentTimeMillis();
 
