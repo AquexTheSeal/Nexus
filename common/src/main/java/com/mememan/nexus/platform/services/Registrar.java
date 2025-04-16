@@ -56,13 +56,13 @@ import java.util.function.Supplier;
  *              }
  *
  *              private static Supplier<Block> registerItemlessBlock(String id, Supplier<Block> blockSup) {
- *                  Supplier<Block> registeredBlockSup = CAServices.REGISTRAR.registerObject(CAConstants.prefix(id), blockSup, BuiltInRegistries.BLOCK); // Otherwise reference to the block sup is null cuz it needs to be registered beforehand
+ *                  Supplier<Block> registeredBlockSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), blockSup, BuiltInRegistries.BLOCK); // Otherwise reference to the block sup is null cuz it needs to be registered beforehand
  *                  BLOCKS.add(registeredBlockSup);
  *                  return registeredBlockSup;
  *              }
  *
  *              private static Supplier<Item> registerBlockItem(String id, Supplier<Item> itemSup) {
- *                  Supplier<Item> registeredItemSup = CAServices.REGISTRAR.registerObject(CAConstants.prefix(id), itemSup, BuiltInRegistries.ITEM); // Otherwise reference to the item sup is null cuz it needs to be registered beforehand
+ *                  Supplier<Item> registeredItemSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), itemSup, BuiltInRegistries.ITEM); // Otherwise reference to the item sup is null cuz it needs to be registered beforehand
  *                  BLOCK_ITEMS.add(registeredItemSup);
  *                  return registeredItemSup;
  *              }

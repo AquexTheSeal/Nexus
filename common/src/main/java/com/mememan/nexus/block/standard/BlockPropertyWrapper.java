@@ -3,12 +3,12 @@ package com.mememan.nexus.block.standard;
 import com.google.common.collect.ImmutableMap;
 import com.mememan.nexus.block.data.BlockModelDefinition;
 import com.mememan.nexus.block.data.BlockStateDefinition;
+import com.mememan.nexus.client.block.WrappedBlockColor;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
-import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
@@ -413,14 +413,14 @@ public class BlockPropertyWrapper {
     }
 
     /**
-     * Gets the {@link BlockColor} {@code Function<Supplier<Block>, BlockColor>} from the {@link #builder()} if the
+     * Gets the {@link WrappedBlockColor} {@code Function<Supplier<Block>, WrappedBlockColor>} from the {@link #builder()} if the
      * builder exists, and it is defined within said builder. May be {@code null}.
      *
-     * @return The {@code Function<Supplier<Block>, BlockColor>}, or {@code null} if the {@link #builder()} is
+     * @return The {@code Function<Supplier<Block>, WrappedBlockColor>}, or {@code null} if the {@link #builder()} is
      * {@code null} || it isn't defined within said builder.
      */
     @Nullable
-    public Function<Supplier<Block>, BlockColor> getBlockColorMappingFunc() {
+    public Function<Supplier<Block>, WrappedBlockColor> getBlockColorMappingFunc() {
         return builder == null ? null : builder.blockColorMappingFunc;
     }
 
@@ -564,7 +564,7 @@ public class BlockPropertyWrapper {
         private Function<Supplier<Block>, List<BlockModelDefinition>> bmdMappingFunc;
         private List<Supplier<CreativeModeTab>> parentTabs = new ObjectArrayList<>();
         @Nullable
-        private Function<Supplier<Block>, BlockColor> blockColorMappingFunc;
+        private Function<Supplier<Block>, WrappedBlockColor> blockColorMappingFunc;
         @Nullable
         private Function<Supplier<Block>, IntIntMutablePair> flammabilityMappingFunc;
         @Nullable
@@ -947,14 +947,14 @@ public class BlockPropertyWrapper {
         }
 
         /**
-         * Defines a custom mapping function representing the parent {@linkplain Block Block's} optional {@link BlockColor}.
+         * Defines a custom mapping function representing the parent {@linkplain Block Block's} optional {@link WrappedBlockColor}.
          *
          * @param blockColorMappingFunc The mapping function accepting a representation of the parent
-         *                              {@linkplain Block Block's} optional {@link BlockColor}.
+         *                              {@linkplain Block Block's} optional {@link WrappedBlockColor}.
          *
          * @return {@code this} (builder method).
          */
-        public BPWBuilder withBlockColor(Function<Supplier<Block>, BlockColor> blockColorMappingFunc) {
+        public BPWBuilder withBlockColor(Function<Supplier<Block>, WrappedBlockColor> blockColorMappingFunc) {
             this.blockColorMappingFunc = blockColorMappingFunc;
             return this;
         }
