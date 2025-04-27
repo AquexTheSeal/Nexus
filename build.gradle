@@ -107,6 +107,8 @@ subprojects {
 
                 "publisher_plugin_version"              : publisher_plugin_version,
 
+                "mixinextras_version"                   : mixinextras_version,
+
                 // Base (Forge)
                 "issue_tracker_url"                     : issue_tracker_url,
                 "display_url"                           : display_url,

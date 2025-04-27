@@ -4,8 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Side-safe variant of {@link net.minecraft.client.renderer.item.ItemPropertyFunction} to avoid accidental classloading

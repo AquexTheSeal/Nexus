@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
@@ -384,13 +383,13 @@ public class ItemPropertyWrapper {
     }
 
     /**
-     * Gets the {@link Map} of item model predicates from the {@link #builder()} if the builder exists, and it is
-     * defined within said builder.
+     * Gets the {@link Object2ObjectOpenHashMap} of item model predicates from the {@link #builder()} if the builder
+     * exists, and it is defined within said builder.
      *
-     * @return The {@link Map} of item model predicates, or an empty {@link Object2ObjectOpenHashMap} if the
-     * {@link #builder()} is {@code null}.
+     * @return The {@link Object2ObjectOpenHashMap} of item model predicates, or an empty {@link Object2ObjectOpenHashMap}
+     * if the {@link #builder()} is {@code null}.
      */
-    public Map<Pair<Supplier<Item>, ResourceLocation>, ClampedItemPropertyFunction> getItemModelPredicates() {
+    public Object2ObjectOpenHashMap<ResourceLocation, WrappedClampedItemPropertyFunction> getItemModelPredicates() {
         return builder == null ? new Object2ObjectOpenHashMap<>() : builder.itemModelPredicates;
     }
 
@@ -438,7 +437,7 @@ public class ItemPropertyWrapper {
         @Nullable
         private Function<String, String> itemTranslationFunc;
         private boolean literalTranslation = false;
-        private final Map<Pair<Supplier<Item>, ResourceLocation>, ClampedItemPropertyFunction> itemModelPredicates = new Object2ObjectOpenHashMap<>();
+        private final Object2ObjectOpenHashMap<ResourceLocation, WrappedClampedItemPropertyFunction> itemModelPredicates = new Object2ObjectOpenHashMap<>();
 
         private IPWBuilder(ItemPropertyWrapper ownerWrapper, Supplier<Item> itemParent) {
             this.ownerWrapper = ownerWrapper;
@@ -714,8 +713,7 @@ public class ItemPropertyWrapper {
          * Defines a {@link WrappedClampedItemPropertyFunction} to be properly registered for use on the client for use in
          * texture overrides.
          *
-         * @param modelOverrideIDPair A {@link Pair} comprised of a {@code Supplier<Item>} and a {@link ResourceLocation}
-         *                            representing the owning item and the name of the model predicate, respectively.
+         * @param modelOverrideID A {@link ResourceLocation} representing the name of the model predicate.
          * @param modelOverrideFunction The {@link WrappedClampedItemPropertyFunction} to register. Must be registered if you
          *                              plan on adding any custom texture overrides. This should preferably be a
          *                              {@code static} constant stored somewhere.
@@ -725,18 +723,18 @@ public class ItemPropertyWrapper {
          * @see #withModelPredicates(Map)
          * @see #withSetModelPredicates(Map)
          */
-        public IPWBuilder withModelPredicate(Pair<Supplier<Item>, ResourceLocation> modelOverrideIDPair, WrappedClampedItemPropertyFunction modelOverrideFunction) {
-            itemModelPredicates.put(modelOverrideIDPair, modelOverrideFunction); // No need for putIfAbsent, we can just do value overrides instead
+        public IPWBuilder withModelPredicate(ResourceLocation modelOverrideID, WrappedClampedItemPropertyFunction modelOverrideFunction) {
+            itemModelPredicates.put(modelOverrideID, modelOverrideFunction); // No need for putIfAbsent, we can just do value overrides instead
             return this;
         }
 
         /**
          * Defines a {@link Map} of {@link WrappedClampedItemPropertyFunction} objects to be properly registered for use on the
-         * client in terms of texture overrides, mapped to key {@link ResourceLocation} objects representing their names, tied
-         * to a specific {@code Supplier<Item>}. This method appends to the existing {@link Map}.
+         * client in terms of texture overrides, mapped to key {@link ResourceLocation} objects representing their names.
+         * This method appends to the existing {@link Map}.
          *
          * @param modelOverrideFunctions A {@link Map} of {@link WrappedClampedItemPropertyFunction} objects to register,
-         *                               mapped to their key items/names. Must be registered if you plan on adding any custom
+         *                               mapped to their key names. Must be registered if you plan on adding any custom
          *                               texture overrides. This should preferably be a {@code static} constant stored
          *                               somewhere.
          *
@@ -745,18 +743,18 @@ public class ItemPropertyWrapper {
          * @see #withModelPredicate(Pair, WrappedClampedItemPropertyFunction)
          * @see #withSetModelPredicates(Map)
          */
-        public IPWBuilder withModelPredicates(Map<Pair<Supplier<Item>, ResourceLocation>, WrappedClampedItemPropertyFunction> modelOverrideFunctions) {
+        public IPWBuilder withModelPredicates(Map<ResourceLocation, WrappedClampedItemPropertyFunction> modelOverrideFunctions) {
             itemModelPredicates.putAll(modelOverrideFunctions);
             return this;
         }
 
         /**
          * Defines a {@link Map} of {@link WrappedClampedItemPropertyFunction} objects to be properly registered for use on the
-         * client in terms of texture overrides, mapped to key {@link ResourceLocation} objects representing their names, tied to
-         * a specific {@code Supplier<Item>}. This method overrides the existing {@link List}.
+         * client in terms of texture overrides, mapped to key {@link ResourceLocation} objects representing their names.
+         * This method overrides the existing {@link Map}.
          *
          * @param modelOverrideFunctions A {@link Map} of {@link WrappedClampedItemPropertyFunction} objects to register,
-         *                               mapped to their key items/names. Must be registered if you plan on adding any custom
+         *                               mapped to their key names. Must be registered if you plan on adding any custom
          *                               texture overrides. This should preferably be a {@code static} constant stored
          *                               somewhere.
          *
@@ -765,7 +763,7 @@ public class ItemPropertyWrapper {
          * @see #withModelPredicate(Pair, WrappedClampedItemPropertyFunction)
          * @see #withModelPredicates(Map) (Map)
          */
-        public IPWBuilder withSetModelPredicates(Map<Pair<Supplier<Item>, ResourceLocation>, WrappedClampedItemPropertyFunction> modelOverrideFunctions) {
+        public IPWBuilder withSetModelPredicates(Map<ResourceLocation, WrappedClampedItemPropertyFunction> modelOverrideFunctions) {
             itemModelPredicates.clear();
             itemModelPredicates.putAll(modelOverrideFunctions);
             return this;

@@ -31,10 +31,10 @@ import java.util.function.Supplier;
  *     {@code
  *          @RegistrarEntry // Optional, you can use bootstrap methods or some other way to statically initialize this class
  *          public class MyModBlocks {
- *              private static final ObjectArrayList<Supplier<Block>> BLOCKS = new ObjectArrayList<>(); // Collection type can vary based on your use-case, but this is generally how you'd do it for a standard registry
- *              private static final ObjectArrayList<Supplier<Item>> BLOCK_ITEMS = new ObjectArrayList<>(); // If your blocks are going to have their own items, you should also store those separately
+ *              private static final ObjectArrayList<Supplier<? extends Block>> BLOCKS = new ObjectArrayList<>(); // Collection type can vary based on your use-case, but this is generally how you'd do it for a standard registry
+ *              private static final ObjectArrayList<Supplier<? extends Item>> BLOCK_ITEMS = new ObjectArrayList<>(); // If your blocks are going to have their own items, you should also store those separately
  *
- *              public static final Supplier<Block> EXAMPLE_BLOCK = BlockPropertyWrapper.of(BlockPropertyWrappers.BASIC_BLOCK, registerBlock())
+ *              public static final Supplier<Block> EXAMPLE_BLOCK = BlockPropertyWrapper.of(BlockPropertyWrappers.BASIC_BLOCK, registerBlock(...))
  *                  .cachedBuilder()
  *                  .withParentCreativeModeTab(YourCMTRegistrarClass.YOUR_BLOCK_TAB)
  *                  .build()
@@ -43,26 +43,30 @@ import java.util.function.Supplier;
  *              // All methods below are optional; you can register your objects however you want so long as you're ordering everything correctly (Not attempting to access objects before they're registered via NexusServices.REGISTRAR.registerObject(...), etc.)
  *              // Nexus API offers shortcut utility methods that allow for flexibility based on your needs inside of the com.mememan.nexus.template subpackages
  *
- *              private static Supplier<Block> registerBlock(String id, Supplier<Block> blockSup, Item.Properties blockItemProperties) {
- *                  Supplier<Block> registeredBlock = registerItemlessBlock(id, blockSup);
+ *              private static <B extends Block Supplier<B> registerBlock(String id, Supplier<B> blockSup) {
+ *                  return registerBlock(id, blockSup, new Item.Properties());
+ *              }
+ *
+ *              private static <B extends Block Supplier<B> registerBlock(String id, Supplier<B> blockSup, Item.Properties blockItemProperties) {
+ *                  Supplier<B> registeredBlock = registerItemlessBlock(id, blockSup);
  *                  registerBlockItem(id, () -> new BlockItem(registeredBlock.get(), blockItemProperties));
  *                  return registeredBlock;
  *              }
  *
- *              private static Supplier<Block> registerBlock(String id, Supplier<Block> blockSup, Supplier<Item> itemSup) {
- *                  Supplier<Block> registeredBlock = registerItemlessBlock(id, blockSup);
+ *              private static <B extends Block, I extends Item> Supplier<B> registerBlock(String id, Supplier<B> blockSup, Supplier<I> itemSup) {
+ *                  Supplier<B> registeredBlock = registerItemlessBlock(id, blockSup);
  *                  registerBlockItem(id, itemSup);
  *                  return registeredBlock;
  *              }
  *
- *              private static Supplier<Block> registerItemlessBlock(String id, Supplier<Block> blockSup) {
- *                  Supplier<Block> registeredBlockSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), blockSup, BuiltInRegistries.BLOCK); // Otherwise reference to the block sup is null cuz it needs to be registered beforehand
+ *              private static <B extends Block> Supplier<B> registerItemlessBlock(String id, Supplier<B> blockSup) {
+ *                  Supplier<B> registeredBlockSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), blockSup, BuiltInRegistries.BLOCK); // Otherwise reference to the block sup is null cuz it needs to be registered beforehand
  *                  BLOCKS.add(registeredBlockSup);
  *                  return registeredBlockSup;
  *              }
  *
- *              private static Supplier<Item> registerBlockItem(String id, Supplier<Item> itemSup) {
- *                  Supplier<Item> registeredItemSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), itemSup, BuiltInRegistries.ITEM); // Otherwise reference to the item sup is null cuz it needs to be registered beforehand
+ *              private static <I extends Item> Supplier<I> registerBlockItem(String id, Supplier<I> itemSup) {
+ *                  Supplier<I> registeredItemSup = NexusServices.REGISTRAR.registerObject(NexusConstants.prefix(id), itemSup, BuiltInRegistries.ITEM); // Otherwise reference to the item sup is null cuz it needs to be registered beforehand
  *                  BLOCK_ITEMS.add(registeredItemSup);
  *                  return registeredItemSup;
  *              }
@@ -70,11 +74,11 @@ import java.util.function.Supplier;
  *              // You would typically want others to have read-only access to your registered objects
  *              // Note that others modifying your custom collections won't actually affect objects you've registered to the game (I.E. If they, for instance, try BLOCKS.remove(EXAMPLE_BLOCK), it won't actually remove the block from the game)
  *
- *              public static ImmutableList<Supplier<Block>> getBlocks() {
+ *              public static ImmutableList<Supplier<? extends Block>> getBlocks() {
  *                  return BLOCKS;
  *              }
  *
- *              public static ImmutableList<Supplier<Item>> getBlockItems() {
+ *              public static ImmutableList<Supplier<? extends Item>> getBlockItems() {
  *                  return BLOCK_ITEMS;
  *              }
  *          }

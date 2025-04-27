@@ -1,6 +1,7 @@
 package com.mememan.nexus.util;
 
 import com.mememan.nexus.client.block.WrappedBlockColor;
+import com.mememan.nexus.client.item.WrappedClampedItemPropertyFunction;
 import com.mememan.nexus.client.item.WrappedItemPropertyFunction;
 import com.mememan.nexus.loader.EnvironmentSide;
 import com.mememan.nexus.platform.NexusServices;
@@ -8,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -71,7 +73,20 @@ public class ClientUtil {
      */
     @Nullable
     public static ItemPropertyFunction toItemPropertyFunction(WrappedItemPropertyFunction itemModelPredicateFunc) {
-        return onClient() ? itemModelPredicateFunc::getValueForStack : null;
+        return onClient() && itemModelPredicateFunc != null ? itemModelPredicateFunc::getValueForStack : null;
+    }
+
+    /**
+     * Side-safe object conversion method that attempts to convert a {@link WrappedClampedItemPropertyFunction} to a
+     * {@link ClampedItemPropertyFunction} only if on the client. May be {@code null}.
+     *
+     * @param itemModelPredicateFunc The {@link WrappedClampedItemPropertyFunction} to convert.
+     *
+     * @return The converted {@link ClampedItemPropertyFunction} if on the client. May be {@code null}.
+     */
+    @Nullable
+    public static ClampedItemPropertyFunction toClampedItemPropertyFunction(WrappedClampedItemPropertyFunction itemModelPredicateFunc) {
+        return onClient() && itemModelPredicateFunc != null ? itemModelPredicateFunc::getValueForStack : null;
     }
 
     /**
@@ -84,6 +99,6 @@ public class ClientUtil {
      */
     @Nullable
     public static BlockColor toBlockColor(WrappedBlockColor targetBlockColor) {
-        return onClient() ? targetBlockColor::getColor : null;
+        return onClient() && targetBlockColor != null ? targetBlockColor::getColor : null;
     }
 }

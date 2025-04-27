@@ -7,14 +7,35 @@ thereby streamlining mod development on MultiLoader.
 
 Add the following to your `build.gradle` file:
 
+```groovy
+repositories { // Specific repo block depends on the platform you're building your mod on
+    maven {
+        name = "Meme Man Maven"
+        url = "https://dl.cloudsmith.io/public/meme-man-mods/nexus/maven/"
+    }
+}
+
+dependencies { // Choose based on the platform you're developing for
+    // Forge (ForgeGradle)
+    
+    // Fabric (Loom)
+    
+    // NeoForge (ModDevGradle)
+    
+    // MultiLoader (VanillaGradle)
+    
+    // Architectury (ArchLoom)
+}
+```
+
 Nexus API also has a [Github Wiki](https://github.com/RaveTr/Nexus/wiki).
 
 # Primary Feature Set
 
 - Platform-agnostic registrar (supports all Vanilla-supported registry types, see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
 - Platform-agnostic loader-specific operations (see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
-- Platform-agnostic networking
-- Platform-agnostic datagen (Backed by Neo/Forge datagen, see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
+- Platform-agnostic networking (see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
+- Platform-agnostic datagen (see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
 - Natively-provided utilities for object registration (supports most Vanilla registries, see the [wiki](https://github.com/RaveTr/Nexus/wiki) for more info)
 
 ... and a whole lot more.
@@ -54,5 +75,3 @@ initialization caching (+ a handful of other optimizations) in order to mimic Fa
 reduce dynamic computation times to around O(1) (For the nerdy devs, a ``get()`` call is performed on a FastUtil 
 ``HashMap`` implementation, specifically ``Object2ObjectOpenHashMap``, which is O(1) time complexity). In short, it's 
 fast enough to where you don't need to worry about it.
-
-## 

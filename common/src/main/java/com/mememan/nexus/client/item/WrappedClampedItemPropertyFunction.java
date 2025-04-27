@@ -1,6 +1,5 @@
 package com.mememan.nexus.client.item;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -27,8 +26,8 @@ public interface WrappedClampedItemPropertyFunction extends WrappedItemPropertyF
      *
      * @return A clamped {@code float} value representing the validity of the model predicate between 0 and 1.
      *
-     * @see net.minecraft.client.gui.Gui#renderHotbar(float, GuiGraphics) GUI#renderHotbar for more info on how seed is
-     * computed.
+     * @see net.minecraft.client.gui.Gui#renderHotbar(float, net.minecraft.client.gui.GuiGraphics) GUI#renderHotbar for
+     * more info on how seed is computed.
      */
     @Override
     default float getValueForStack(ItemStack targetStack, @Nullable Level curLevel, @Nullable LivingEntity livingOwner, int seed) {
@@ -49,8 +48,8 @@ public interface WrappedClampedItemPropertyFunction extends WrappedItemPropertyF
      *
      * @return An unclamped {@code float} value representing the validity of the model predicate.
      *
-     * @see net.minecraft.client.gui.Gui#renderHotbar(float, GuiGraphics) GUI#renderHotbar for more info on how seed is
-     * computed.
+     * @see net.minecraft.client.gui.Gui#renderHotbar(float, net.minecraft.client.gui.GuiGraphics) GUI#renderHotbar for
+     * more info on how seed is computed.
      */
     float getUnclampedValueForStack(ItemStack targetStack, @Nullable Level curLevel, @Nullable LivingEntity livingOwner, int seed);
 }

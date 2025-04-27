@@ -7,6 +7,7 @@ import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
@@ -17,9 +18,12 @@ public class TestItemRegistrar {
 
     public static final Supplier<Item> TEST_ITEM = ItemPropertyWrapper.create(registerItem(NexusConstants.prefix("test_item"), () -> new Item(new Item.Properties())))
             .builder()
+            .asCompostable(I -> 20.0F)
+            .asFuel(I -> 200)
+            .withParentCreativeModeTab(() -> CreativeModeTabs.allTabs().get(3))
             .build()
             .getParentItem();
-
+    
     private static <I extends Item> Supplier<I> registerItem(ResourceLocation name, Supplier<I> item) {
         Supplier<I> registeredItem = NexusServices.REGISTRAR.registerObject(name, item, BuiltInRegistries.ITEM);
         ITEMS.add(registeredItem);

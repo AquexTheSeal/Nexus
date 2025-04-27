@@ -5,7 +5,7 @@ package com.mememan.nexus.loader;
  */
 public enum ModSide {
     CLIENT("Client"),
-    COMMON("Both"),
+    COMMON("Common"),
     SERVER("Server");
 
     private final String sideName;
