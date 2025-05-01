@@ -7,6 +7,7 @@ import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 
@@ -21,6 +22,7 @@ public class TestItemRegistrar {
             .asCompostable(I -> 20.0F)
             .asFuel(I -> 200)
             .withParentCreativeModeTab(() -> CreativeModeTabs.allTabs().get(3))
+            .withTag(() -> ItemTags.ACACIA_LOGS)
             .build()
             .getParentItem();
     

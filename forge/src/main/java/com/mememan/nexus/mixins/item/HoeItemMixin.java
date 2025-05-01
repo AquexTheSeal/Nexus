@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,7 +24,9 @@ import java.util.function.Supplier;
 
 /**
  * Mixin for properly applying custom hoe tilling behaviour set by BPWs, using MixinExtras to allow for chaining of
- * {@code @Redirect} annotations via {@code @ModifyExpressionValue} and {@code @WrapOperation}.
+ * {@link Redirect} annotations via {@link ModifyExpressionValue} and {@link WrapOperation}.
+ *
+ * @see NexusForgeCommonMiscEvents
  */
 @Mixin(HoeItem.class)
 public abstract class HoeItemMixin {

@@ -12,9 +12,25 @@ import java.util.Map;
  */
 public interface DataGenerator {
 
+    /**
+     * Bootstrap method responsible for setting up the data generator service and notifying/calling all data provider
+     * registrars for processing/setup.
+     * <br></br>
+     * Should <b>NOT</b> be called anywhere else!
+     */
     @ApiStatus.Internal
+    @ApiStatus.OverrideOnly
     void setupDataGenerator();
 
+    /**
+     *
+     *
+     * @param dataProvider
+     *
+     * @return
+     *
+     * @param <DP>
+     */
     <DP extends DataProvider> DP registerDataProvider(final DP dataProvider);
 
     <DP extends DataProvider> Map<String, Pair<Boolean, DP>> getMappedDataProviders();

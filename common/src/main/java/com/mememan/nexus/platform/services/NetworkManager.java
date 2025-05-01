@@ -35,6 +35,7 @@ public interface NetworkManager {
      * load your packet registrar class(es).
      */
     @ApiStatus.Internal
+    @ApiStatus.OverrideOnly
     void setupNetworkManager();
 
     /**
@@ -47,7 +48,7 @@ public interface NetworkManager {
      *         @NetworkRegistrarEntry // Optional; you can use bootstrap methods or some other way to statically initialize this class
      *         public class MyPacketRegistrarClass {
      *
-     *             public static final BasePacket MY_PACKET = registerPacket(new BasePacket(new ResourceLocation("my_modid", "my_packet"), MyPacket.class, MyPacket::encode, MyPacket::decode, MyPacket::handle, NetworkSide.CLIENT_TO_SERVER));
+     *             public static final BasePacket<MyPacket> MY_PACKET = registerPacket(new BasePacket<>(new ResourceLocation("my_modid", "my_packet"), MyPacket.class, MyPacket::encode, MyPacket::decode, MyPacket::handle, NetworkSide.C2S));
      *
      *             private static <MSGT> BasePacket<MSGT> registerPacket(BasePacket<MSGT> packet) {
      *                  return NexusServices.NETWORK_MANAGER.registerPacket(packet);
@@ -81,7 +82,7 @@ public interface NetworkManager {
      *              public static PacketContext handle(MyPacket myPacketObj) {
      *                  return (nullablePlayerOwner, currentLevel, currentConnection, currentSide) -> {
      *                      // ... (Do stuff)
-     *                  }
+     *                  };
      *              }
      *         }
      *     }
@@ -110,6 +111,9 @@ public interface NetworkManager {
      * @param s2cPacket The packet object to send.
      *
      * @param <MSGT> The type of the packet object.
+     *
+     * @implNote This method has no functional implementation on Fabric due to how Fabric's networking API works. It is
+     * recommended to use {@link #sendToClient(Object, ServerPlayer)} instead.
      */
     <MSGT> void sendToClient(MSGT s2cPacket);
 

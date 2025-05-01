@@ -48,7 +48,7 @@ public interface PlatformManager {
 
     /**
      * Discovers all (mod) classes that are annotated with the specified annotation type and compiles them into a
-     * {@link List}. Take note that this method <b>loads</b> (valid) discovered classes.
+     * {@link List}. Take note that this method <b>loads and initializes</b> (valid) discovered classes.
      *
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
@@ -161,8 +161,27 @@ public interface PlatformManager {
      * to the game's startup time, and that's only on its first call when nothing's cached yet.
      *
      * @return A {@link Set} of all loaded mods, represented as {@link ModData} objects.
+     *
+     * @implNote Mind that this collection doesn't include Minecraft or Java, as some loader implementations do.
      */
     Set<ModData> getModData();
+
+    /**
+     * Convenient shortcut method that streams through {@link #getModData()} and retrieves the {@link ModData}
+     * corresponding to the provided {@code modId}.
+     *
+     * @param modId The {@code modId} whose {@link ModData} should be retrieved.
+     *
+     * @return The {@link ModData} matching the {@code modId} passed in. May be {@code null} if no such mod is loaded (or
+     * somehow, in an anomalously impossible case, {@link #getModData()} is empty).
+     */
+    @Nullable
+    default ModData getModDataById(String modId) {
+        return getModData().isEmpty() ? null : getModData().stream()
+                .filter(curModData -> curModData.getModMetadata().modId().equals(modId))
+                .findFirst()
+                .orElse(null);
+    }
 
     /**
      * Gets the {@link GamePathWrapper} representing path-related operations for a given loader.

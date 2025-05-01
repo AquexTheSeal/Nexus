@@ -28,7 +28,7 @@ public final class ClassFinder {
     }
 
     /**
-     * Loads the specified {@code class} without initializing it.
+     * Loads the specified {@code class} into the JVM without initializing it.
      *
      * @param targetClassName The name of the {@code class} to load.
      *

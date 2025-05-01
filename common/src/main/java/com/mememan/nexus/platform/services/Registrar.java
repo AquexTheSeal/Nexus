@@ -104,6 +104,7 @@ public interface Registrar {
      * Should <b>NOT</b> be called anywhere else!
      */
     @ApiStatus.Internal
+    @ApiStatus.OverrideOnly
     void setupRegistrar();
 
     /**
@@ -135,7 +136,8 @@ public interface Registrar {
      * <br></br>
      * Generally, any datapack registries available in the {@link Registries} class can be used for this method. This
      * could include custom datapack registries. Datapack registries are {@linkplain Registry Registries} that store any
-     * form of CODECs for de/serializing data from/to JSON files pertaining to their respective object types.
+     * form of CODECs for de/serializing data from/to JSON files pertaining to their respective object types and can be
+     * accessed via {@link RegistryAccess} (commonly found in {@link Level} instances).
      *
      * @param objId The id of the object to register, following Minecraft's regex naming conventions/constraints
      *              (<code>[a-z0-9_.-]</code>). Duplicate exceptions and other edge-cases are handled accordingly
@@ -145,7 +147,7 @@ public interface Registrar {
      *              file within the datapack registry's target directory (except in the case of datagen, in which case
      *              this is used to generate the JSON file itself).
      * @param objSupMappingFunc The actual object pertaining to the registered {@link ResourceKey<Registry<T>>}.
-     *                          Is a {@link Function} that takes a {@link BootstapContext} instance as input and returns
+     *                          Is a {@link Function} that takes a {@link BootstapContext} instance as input and outputs
      *                          the object to register.
      * @param targetDatapackRegistry The target datapack registry to register the specified object to.
      *

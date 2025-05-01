@@ -94,7 +94,7 @@ public class FabricNetworkManager implements NetworkManager {
 
     @Override
     public <MSGT> void sendToClient(MSGT s2cPacket) {
-        throw new UnsupportedOperationException("Attempted to send ambiguous S2C packet on Fabric! Use sendToClient(MSGT s2cPacket, ServerPlayer targetPlayer) instead.");
+        NexusConstants.LOGGER.warn("Attempted to send ambiguous S2C packet on Fabric! Use sendToClient(MSGT s2cPacket, ServerPlayer targetPlayer) instead.");
     }
 
     @Override

@@ -21,7 +21,8 @@ import java.util.function.Consumer;
  *
  * @apiNote A {@link ModData} object may represent one mod instance, NOT to be confused with a whole JAR file. While 2
  * {@link ModData} instances may share the same exact collection of file paths as part of the same JAR (uncommon but
- * possible, as in the case of JiJ, for example), each instance holds its own unique metadata.
+ * possible, as in rare cases of JiJ, for example [usually, both are unique to each other]), each instance holds its own
+ * unique metadata.
  */
 public interface ModData {
 
@@ -74,7 +75,7 @@ public interface ModData {
 
     /**
      * Discovers all (mod) classes that are annotated with the specified annotation type and compiles them into a
-     * {@link List}. Take note that this method <b>loads</b> (valid) discovered classes.
+     * {@link List}. Take note that this method <b>loads and initializes</b> (valid) discovered classes.
      *
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes

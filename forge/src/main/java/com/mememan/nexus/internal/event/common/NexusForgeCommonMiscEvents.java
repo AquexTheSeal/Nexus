@@ -1,6 +1,7 @@
 package com.mememan.nexus.internal.event.common;
 
 import com.mememan.nexus.block.standard.BlockPropertyWrapper;
+import com.mememan.nexus.internal.ForgeVanillaCompat;
 import com.mememan.nexus.item.standard.ItemPropertyWrapper;
 import com.mememan.nexus.tag.TagWrapper;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -28,6 +29,8 @@ import java.util.function.Supplier;
 /**
  * Internal event {@code class} responsible for handling {@code static} memory caching of different {@code PropertyWrapper}
  * implementations' properties and retrieving them for Vanilla compatibility features.
+ *
+ * @see ForgeVanillaCompat
  */
 public class NexusForgeCommonMiscEvents {
     public static final Object2ObjectOpenHashMap<Block, Object2ObjectOpenHashMap<ToolAction, Function<Supplier<Block>, BlockState>>> CACHED_BLOCK_TOOL_ACTIONS = new Object2ObjectOpenHashMap<>();
@@ -35,6 +38,7 @@ public class NexusForgeCommonMiscEvents {
     public static final Object2IntOpenHashMap<Item> CACHED_FUEL_TIME = new Object2IntOpenHashMap<>();
 
     static { // Handle action-mapping once on static initialization
+        // Blocks
         BlockPropertyWrapper.getMappedBpws().forEach((parentBlockSup, curBpw) -> {
             Function<Supplier<Block>, Supplier<Block>> strippedBlockVariant = curBpw.getBlockStrippingMappingFunc();
             Function<Supplier<Block>, BlockState> flattenedBlockVariant = curBpw.getBlockFlatteningMappingFunc();
@@ -58,12 +62,14 @@ public class NexusForgeCommonMiscEvents {
             if (cookTime != null && cookTime != 0) CACHED_FUEL_TIME.put(parentBlockSup.get().asItem(), (int) cookTime);
         });
 
+        // Items
         ItemPropertyWrapper.getMappedIpws().forEach((parentItemSup, curIpw) -> {
             Integer cookTime = curIpw.getItemFuelMappingFunc() == null ? null : Math.abs(curIpw.getItemFuelMappingFunc().apply(parentItemSup));
 
             if (cookTime != null && cookTime != 0) CACHED_FUEL_TIME.put(parentItemSup.get(), (int) cookTime);
         });
 
+        // Tags
         TagWrapper.getCachedTWEntries().stream().filter(curTw -> curTw.getParentTag().get().isFor(Registries.ITEM) && curTw.getCookTime() != 0).forEach(curTw -> {
             for (Holder<Item> itemEntryHolder : BuiltInRegistries.ITEM.getTagOrEmpty((TagKey<Item>) curTw.getParentTag().get())) {
                 CACHED_FUEL_TIME.put(itemEntryHolder.value(), Math.abs(curTw.getCookTime()));
