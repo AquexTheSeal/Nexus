@@ -5,9 +5,13 @@ import com.mememan.nexus.item.standard.ItemPropertyWrapper;
 import com.mememan.nexus.tag.TagWrapper;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
@@ -24,7 +28,8 @@ public final class FabricVanillaCompat {
 
     /**
      * Internal method responsible for the registration of hardcoded Vanilla compatibility features from Block/Item/Tag
-     * Property Wrappers.
+     * Property Wrappers. Additionally, handles registration of blocks and items to their respective
+     * {@linkplain CreativeModeTab CreativeModeTabs}.
      */
     public static void registerVanillaCompat() {
         // Blocks
@@ -65,6 +70,22 @@ public final class FabricVanillaCompat {
 
             if (tagFuelCookTime != 0 && curTagKey.isFor(Registries.ITEM)) FuelRegistry.INSTANCE.add((TagKey<Item>) curTagKey, tagFuelCookTime);
             if (tagFlammabilitySettings != null && curTagKey.isFor(Registries.BLOCK)) FlammableBlockRegistry.getDefaultInstance().add((TagKey<Block>) curTagKey, Math.abs(tagFlammabilitySettings.leftInt()), Math.abs(tagFlammabilitySettings.rightInt()));
+        });
+
+        // Creative Mode Tabs
+        BuiltInRegistries.CREATIVE_MODE_TAB.entrySet().forEach(tabEntry -> {
+            ResourceKey<CreativeModeTab> targetTabKey = tabEntry.getKey();
+            CreativeModeTab targetTab = tabEntry.getValue();
+
+            // Block CMTs
+            BlockPropertyWrapper.getMappedBpws().entrySet().stream()
+                    .filter(curBpwEntry -> curBpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curBpwEntry.getKey().get().asItem().getDefaultInstance()))
+                    .forEach(curBpwEntry -> ItemGroupEvents.modifyEntriesEvent(targetTabKey).register(tabEntries -> tabEntries.accept(curBpwEntry.getKey().get().asItem().getDefaultInstance())));
+
+            // Item CMTs
+            ItemPropertyWrapper.getMappedIpws().entrySet().stream()
+                    .filter(curIpwEntry -> curIpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curIpwEntry.getKey().get().getDefaultInstance()))
+                    .forEach(curIpwEntry -> ItemGroupEvents.modifyEntriesEvent(targetTabKey).register(tabEntries -> tabEntries.accept(curIpwEntry.getKey().get().getDefaultInstance())));
         });
     }
 }
