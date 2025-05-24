@@ -23,8 +23,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Mixin for properly applying custom hoe tilling behaviour set by BPWs, using MixinExtras to allow for chaining of
- * {@link Redirect} annotations via {@link ModifyExpressionValue} and {@link WrapOperation}.
+ * Mixin for properly applying custom hoe tilling behaviour set by BPWs, using MixinExtras to allow for chaining in place
+ * of {@link Redirect} annotations via {@link ModifyExpressionValue} and {@link WrapOperation}.
  *
  * @see NexusForgeCommonMiscEvents
  */

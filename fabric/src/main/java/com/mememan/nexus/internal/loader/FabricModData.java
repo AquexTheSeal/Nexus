@@ -182,7 +182,7 @@ public class FabricModData implements ModData {
 
                                                 targetClassReader.accept(targetClassVisitor, 0);
                                             } catch (IOException e) {
-                                                NexusConstants.LOGGER.error("Failed to initialize ClassReader for class {} in in-dev mod {}", formattedPathString, targetModContainer.getMetadata().getId(), e);
+                                                NexusConstants.LOGGER.error("Failed to initialize ClassReader for class {} within in-dev mod {}", formattedPathString, targetModContainer.getMetadata().getId(), e);
                                             }
                                         }
                                     })

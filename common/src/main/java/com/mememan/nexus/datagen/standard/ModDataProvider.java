@@ -16,4 +16,17 @@ public interface ModDataProvider extends DataProvider {
      */
     @NotNull
     String getModId();
+
+    /**
+     * Whether this particular provider instance should validate the existence of a data entry for all objects pertaining
+     * to this provider's type.
+     * <br></br>
+     * For instance, if this is a block model provider, returning {@code true} would ensure that all blocks under
+     * {@link #getModId()}'s namespace have at least 1 generated block model, throwing a {@link NullPointerException}
+     * otherwise.
+     *
+     * @return Whether object entries pertaining to this provider should validate the existence of at least 1 mapped data
+     * entry.
+     */
+    boolean validateAllEntries();
 }

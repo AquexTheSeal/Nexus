@@ -151,7 +151,7 @@ public class DamageTypeWrapper {
          * @return The newly data-populated {@link DamageTypeWrapper}.
          */
         public DamageTypeWrapper build() {
-            MAPPED_DTWS.putIfAbsent(ownerDamageType, ownerWrapper); // Whaddya thing a diss (No nullity allowed)
+            MAPPED_DTWS.putIfAbsent(ownerDamageType, ownerWrapper); // Whaddaya thinga diss (No nullity allowed)
             return ownerWrapper;
         }
     }

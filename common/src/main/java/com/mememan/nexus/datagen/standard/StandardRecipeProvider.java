@@ -32,6 +32,7 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
         this.mappedModBPWs = BlockPropertyWrapper.getMappedBpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.BLOCK.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
+                .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
         this.mappedItemIPWs = ItemPropertyWrapper.getMappedIpws().entrySet()
                 .stream()
@@ -69,5 +70,10 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
     @Override
     public @NotNull String getModId() {
         return modId;
+    }
+
+    @Override
+    public boolean validateAllEntries() {
+        return false;
     }
 }

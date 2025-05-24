@@ -70,6 +70,10 @@ public interface ModData {
      * load/initialize any of the classes or annotations themselves.
      *
      * @return A {@link ConcurrentHashMap} of all (mod) classes that have any annotations.
+     *
+     * @apiNote We're specifically using CHM as the backing collection since different loaders have their own optimization
+     * nuances during mod-loading. For instance, Forge creates several mod loading worker threads to load and initialize
+     * mods in parallel, so concurrency is needed in order to avoid race conditions and/or any other undefined behaviour.
      */
     ConcurrentHashMap<String, ObjectArrayList<String>> getCachedAnnotatedClasses();
 
