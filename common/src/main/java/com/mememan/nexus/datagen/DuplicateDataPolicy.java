@@ -24,10 +24,10 @@ public enum DuplicateDataPolicy {
      * Nexus will simply warn the end-developer in the console during datagen and override the existing object with its
      * next duplicate instance. Note that there will still only be 1 instance of said object.
      */
-    INCLUDE_WARN,
+    OVERRIDE_WARN,
     /**
      * Nexus will silently override the existing object with its duplicate. Note that there will still only be 1 instance
      * of said object.
      */
-    INCLUDE_SILENT
+    OVERRIDE_SILENT
 }

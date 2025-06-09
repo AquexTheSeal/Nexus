@@ -1,5 +1,6 @@
 package com.mememan.nexus.datagen.standard;
 
+import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.ProviderType;
 import net.minecraft.data.DataProvider;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,26 @@ public interface ModDataProvider extends DataProvider {
     @NotNull
     ProviderType getProviderType();
 
+    /**
+     * The {@link DuplicateDataPolicy} to use whenever duplicate data is encountered.
+     *
+     * @return This instance's {@link DuplicateDataPolicy}.
+     */
+    @NotNull
+    DuplicateDataPolicy getDuplicateDataPolicy();
+
+    /**
+     * Default override for {@link DataProvider#getName()}.
+     * <br></br>
+     * Minecraft uses this to check for duplicate data providers.
+     * Obviously, most vanilla classes implement this as {@code final}, but we're modders with the ability to AT/AW, so
+     * it doesn't really matter.
+     * <br></br>
+     * As an end-developer, you don't really need to worry about this all too much unless you're implementing your own
+     * custom provider(s).
+     *
+     * @return The name of this data provider instance.
+     */
     @Override
     default @NotNull String getName() {
         return " [" + getModId() + "]";

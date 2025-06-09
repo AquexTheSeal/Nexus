@@ -1,19 +1,27 @@
 package com.mememan.nexus.datagen.standard;
 
+import com.google.gson.JsonObject;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.block.standard.BlockPropertyWrapper;
+import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.datagen.ProviderType;
 import com.mememan.nexus.item.standard.ItemPropertyWrapper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -24,10 +32,11 @@ import java.util.function.Supplier;
 public class StandardRecipeProvider extends RecipeProvider implements ModDataProvider {
     protected final String modId;
     protected final Object2ObjectOpenHashMap<Supplier<Block>, BlockPropertyWrapper> mappedModBPWs;
-    protected final Object2ObjectOpenHashMap<Supplier<Item>, ItemPropertyWrapper> mappedItemIPWs;
+    protected final Object2ObjectOpenHashMap<Supplier<Item>, ItemPropertyWrapper> mappedModIPWs;
     protected final boolean validateAllEntries;
+    protected final DuplicateDataPolicy dupeStrat;
 
-    public StandardRecipeProvider(PackOutput targetPackOutput, String modId, boolean validateAllEntries) {
+    public StandardRecipeProvider(PackOutput targetPackOutput, String modId, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
         super(targetPackOutput);
 
         this.modId = modId;
@@ -37,13 +46,14 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
                 .filter(curEntry -> BuiltInRegistries.BLOCK.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
                 .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
-        this.mappedItemIPWs = ItemPropertyWrapper.getMappedIpws().entrySet()
+        this.mappedModIPWs = ItemPropertyWrapper.getMappedIpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.ITEM.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
                 .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
 
         this.validateAllEntries = validateAllEntries;
+        this.dupeStrat = dupeStrat;
     }
 
     @Override
@@ -60,8 +70,8 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
             });
         }
 
-        if (!mappedItemIPWs.isEmpty()) {
-            mappedItemIPWs.forEach((itemSupEntry, ipwEntry) -> {
+        if (!mappedModIPWs.isEmpty()) {
+            mappedModIPWs.forEach((itemSupEntry, ipwEntry) -> {
                 Function<Consumer<FinishedRecipe>, Consumer<Supplier<Item>>> mappedRecipe = ipwEntry.getRecipeMappingFunction();
 
                 if (mappedRecipe != null) {
@@ -74,8 +84,44 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
     }
 
     @Override
+    public @NotNull CompletableFuture<?> run(CachedOutput cachedOutput) {
+        ObjectOpenHashSet<ResourceLocation> recipeLocations = new ObjectOpenHashSet<>();
+        ObjectArrayList<CompletableFuture<?>> recipesAndAdvancements = new ObjectArrayList<>();
+
+        buildRecipes((finishedRecipe) -> {
+            ResourceLocation finishedRecipeId = finishedRecipe.getId();
+            boolean wasAlreadyAdded = !recipeLocations.add(finishedRecipeId);
+            Runnable recipeAndAdvancementSerializer = () -> {
+                recipesAndAdvancements.add(DataProvider.saveStable(cachedOutput, finishedRecipe.serializeRecipe(), this.recipePathProvider.json(finishedRecipeId)));
+
+                JsonObject serializedRecipeAdvancement = finishedRecipe.serializeAdvancement();
+
+                if (serializedRecipeAdvancement != null) {
+                    recipesAndAdvancements.add(DataProvider.saveStable(cachedOutput, serializedRecipeAdvancement, this.advancementPathProvider.json(finishedRecipe.getAdvancementId())));
+                }
+            };
+
+            if (wasAlreadyAdded) {
+                switch (dupeStrat) {
+                    case CRASH -> throw new IllegalStateException(String.format("Attempted to generate duplicate recipe %s (from mod of ID %s), specified DuplicateDataPolicy is CRASH.", finishedRecipeId, getModId()));
+                    case EXCLUDE_WARN -> NexusConstants.LOGGER.warn("Attempted to generate duplicate recipe {} (from mod of ID {}), specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", finishedRecipeId, getModId());
+                    case EXCLUDE_SILENT -> {}
+                    case OVERRIDE_WARN -> {
+                        NexusConstants.LOGGER.warn("Overriding duplicate recipe {} (from mod of ID {}), specified DuplicateDataPolicy is OVERRIDE_WARN.", finishedRecipeId, getModId());
+
+                        recipeAndAdvancementSerializer.run();
+                    }
+                    case OVERRIDE_SILENT -> recipeAndAdvancementSerializer.run();
+                }
+            } else recipeAndAdvancementSerializer.run();
+        });
+
+        return CompletableFuture.allOf(recipesAndAdvancements.toArray(CompletableFuture[]::new));
+    }
+
+    @Override
     public @NotNull String getName() {
-        return super.getName() + " [" + getModId() + "]";
+        return String.format("%s [%s]", super.getName(), getModId());
     }
 
     @Override
@@ -91,5 +137,10 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
     @Override
     public @NotNull ProviderType getProviderType() {
         return NexusProviderTypes.RECIPE_PROVIDER;
+    }
+
+    @Override
+    public @NotNull DuplicateDataPolicy getDuplicateDataPolicy() {
+        return dupeStrat;
     }
 }

@@ -1,11 +1,7 @@
 package com.mememan.nexus.internal.services;
 
-import com.google.common.collect.HashMultimap;
 import com.mememan.nexus.asm.annotations.DatagenRegistrarEntry;
-import com.mememan.nexus.datagen.ModDatagenConfig;
-import com.mememan.nexus.datagen.ModSpecificPackOutput;
-import com.mememan.nexus.datagen.NexusProviderTypes;
-import com.mememan.nexus.datagen.ProviderType;
+import com.mememan.nexus.datagen.*;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.datagen.standard.StandardRecipeProvider;
 import com.mememan.nexus.loader.ModData;
@@ -36,8 +32,6 @@ public class ForgeDataGenerator implements DataGenerator {
     private static net.minecraft.data.DataGenerator CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE;
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends Pair<Boolean, ? extends DataProvider>>>> ENQUEUED_PROVIDERS = new ConcurrentLinkedQueue<>();
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends ModDataProvider>>> ENQUEUED_MOD_PROVIDERS = new ConcurrentLinkedQueue<>();
-    private static final HashMultimap<String, ProviderType> EXCLUDED_PROVIDER_TYPES_BY_ID = HashMultimap.create();
-    private static final ObjectOpenHashSet<String> EXCLUDED_MODS_BY_ID = new ObjectOpenHashSet<>();
     private static final ObjectOpenHashSet<ModDatagenConfig> MOD_DATAGEN_CONFIGS = new ObjectOpenHashSet<>();
 
     @Override
@@ -121,13 +115,14 @@ public class ForgeDataGenerator implements DataGenerator {
                 ModDatagenConfig modDatagenConfig = NexusServices.DATA_GENERATOR.getConfigForMod(modId);
                 boolean allowDatagenForMod = modDatagenConfig == null || modDatagenConfig.enableDatagen();
                 ModSpecificPackOutput modSpecificPackOutput = new ModSpecificPackOutput(formattedOutputPath, curModData, allowDatagenForMod);
-                Set<ProviderType> providersToValidate = modDatagenConfig == null ? Set.of() : modDatagenConfig.providerTypesToFullyValidate();
-                Set<ProviderType> disabledProviders = modDatagenConfig == null ? Set.of() : modDatagenConfig.disabledProviderTypes();
+                Set<ProviderType> providersToValidate = modDatagenConfig == null || modDatagenConfig.providerTypesToFullyValidate() == null ? Set.of() : modDatagenConfig.providerTypesToFullyValidate();
+                Set<ProviderType> disabledProviders = modDatagenConfig == null || modDatagenConfig.disabledProviderTypes() == null ? Set.of() : modDatagenConfig.disabledProviderTypes();
+                DuplicateDataPolicy dupeStrat = modDatagenConfig == null || modDatagenConfig.dupeStrat() == null ? DuplicateDataPolicy.CRASH : modDatagenConfig.dupeStrat();
 
                 // Client
 
                 // Server
-                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER)));
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), dupeStrat));
             });
 
             HAS_CONSUMED_GENERATORS = true;

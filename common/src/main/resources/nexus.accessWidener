@@ -97,6 +97,8 @@ accessible field net/minecraft/server/network/ServerGamePacketListenerImpl conne
 
 # RecipeProvider
 extendable method net/minecraft/data/recipes/RecipeProvider getName ()Ljava/lang/String;
+accessible field net/minecraft/data/recipes/RecipeProvider recipePathProvider Lnet/minecraft/data/PackOutput$PathProvider;
+accessible field net/minecraft/data/recipes/RecipeProvider advancementPathProvider Lnet/minecraft/data/PackOutput$PathProvider;
 
 # ModelProvider
 extendable method net/minecraft/data/models/ModelProvider getName ()Ljava/lang/String;
