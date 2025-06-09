@@ -23,8 +23,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Mixin for properly applying custom hoe tilling behaviour set by BPWs, using MixinExtras to allow for chaining in place
- * of {@link Redirect} annotations via {@link ModifyExpressionValue} and {@link WrapOperation}.
+ * Mixin {@code class} for properly applying custom hoe tilling behaviour set by BPWs, using MixinExtras to allow for
+ * chaining in place of {@link Redirect} annotations via {@link ModifyExpressionValue} and {@link WrapOperation}.
  *
  * @see NexusForgeCommonMiscEvents
  */
@@ -48,8 +48,8 @@ public abstract class HoeItemMixin {
             ObjectObjectMutablePair<Predicate<UseOnContext>, Consumer<UseOnContext>> tillingBehaviourPair = tillingBehaviourFunc.apply(() -> targetBlock);
 
             if (tillingBehaviourPair != null && tillingBehaviourPair.left() != null && tillingBehaviourPair.right() != null && tillingBehaviourPair.left().test(ctx)) tillingBehaviourPair.right().accept(ctx);
-            else originalBehaviourConsumer.accept(originalUseOnCtx);
-        } else originalBehaviourConsumer.accept(originalUseOnCtx);
+            else originalOperation.call(originalBehaviourConsumer, originalUseOnCtx);
+        } else originalOperation.call(originalBehaviourConsumer, originalUseOnCtx);
     }
 
     @ModifyVariable(method = "useOn", at = @At(value = "STORE", ordinal = 0))

@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import com.mememan.nexus.block.data.BlockModelDefinition;
 import com.mememan.nexus.block.data.BlockStateDefinition;
 import com.mememan.nexus.client.block.WrappedBlockColor;
+import com.mememan.nexus.datagen.ProviderType;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
@@ -24,6 +26,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -241,6 +244,7 @@ public class BlockPropertyWrapper {
                 .asCompostable(from.builder.blockCompostingMappingFunc)
                 .asFuel(from.builder.blockFuelMappingFunc)
                 .excludeFromNativeDatagen(from.builder.excludeFromNativeDatagen)
+                .requiresSetDatagenEntries(Map.copyOf(from.builder.mappedProviderRequisites))
                 .build(); // Direct setting of the builder would copy the entire object itself, which would in-turn overwrite it if any calls are made to the copied BPW afterward
     }
 
@@ -534,6 +538,18 @@ public class BlockPropertyWrapper {
     }
 
     /**
+     * Gets a {@link Map} (usually {@link Object2BooleanOpenHashMap}) specifying the {@linkplain ProviderType ProviderTypes}
+     * for which this BPW instance requires data to present for generation. May be empty if {@link #builder} is {@code null}
+     * or the underlying {@link Map} is also empty.
+     *
+     * @return The {@link Map} representing different {@linkplain ProviderType ProviderTypes} and their requirements for
+     * datagen. May be empty.
+     */
+    public Map<ProviderType, Boolean> getProviderTypeRequisites() {
+        return builder == null ? new Object2BooleanOpenHashMap<>() : builder.mappedProviderRequisites;
+    }
+
+    /**
      * Whether this BPW instance is a template. Templates are not stored in {@link #getMappedBpws()} and have no parent
      * {@link Block}.
      *
@@ -598,6 +614,7 @@ public class BlockPropertyWrapper {
         private Function<String, String> blockTranslationFunc;
         private boolean literalTranslation = false;
         private boolean excludeFromNativeDatagen = false;
+        private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
 
         private BPWBuilder(BlockPropertyWrapper ownerWrapper, Supplier<Block> parentBlock) {
             this.ownerWrapper = ownerWrapper;
@@ -1111,9 +1128,104 @@ public class BlockPropertyWrapper {
          *                                 data generation.
          *
          * @return {@code this} (builder method).
+         *
+         * @see #excludeFromNativeDatagen()
+         * @see #requiresDatagenEntry(ProviderType, boolean)
          */
         public BPWBuilder excludeFromNativeDatagen(boolean excludeFromNativeDatagen) {
             this.excludeFromNativeDatagen = excludeFromNativeDatagen;
+            return this;
+        }
+
+        /**
+         * Determines whether this BPWBuilder instance is required to generate necessary block-related data based on the
+         * {@link ProviderType} passed in.
+         * <br></br>
+         * By default, unmapped providers will not require an entry for this BPWBuilder to be generated unless
+         * {@link ModDataProvider#validateAllEntries()} is set to {@code true}.
+         * <br></br>
+         * Mapping the related provider passed in here to {@code requiresDatagenEntry}, set to {@code true}, will flag
+         * this BPWBuilder instance for requiring related data regardless of what
+         * {@link ModDataProvider#validateAllEntries()} is set to.
+         *
+         * @param targetProviderType The {@link ProviderType} to modify the data entry requirement for.
+         * @param requiresDatagenEntry Whether this BPWBuilder should require data related to the specified
+         *                             {@code targetProviderType} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public BPWBuilder requiresDatagenEntry(ProviderType targetProviderType, boolean requiresDatagenEntry) {
+            mappedProviderRequisites.put(targetProviderType, requiresDatagenEntry);
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}.
+         *
+         * @param targetProviderTypes The {@link List} of {@linkplain ProviderType ProviderTypes} to modify the data
+         *                            entry requirements for.
+         * @param requiresDatagenEntry Whether this BPWBuilder should require data related to each of the
+         *                             specified {@code targetProviderTypes} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public BPWBuilder requiresDatagenEntries(List<ProviderType> targetProviderTypes, boolean requiresDatagenEntry) {
+            targetProviderTypes.forEach(type -> requiresDatagenEntry(type, requiresDatagenEntry));
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}. Overrides the existing
+         * {@link Map}.
+         *
+         * @param targetProviderTypes The {@link List} of {@linkplain ProviderType ProviderTypes} to modify the data
+         *                            entry requirements for.
+         * @param requiresDatagenEntry Whether this BPWBuilder should require data related to each of the
+         *                             specified {@code targetProviderTypes} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public BPWBuilder requiresSetDatagenEntries(List<ProviderType> targetProviderTypes, boolean requiresDatagenEntry) {
+            mappedProviderRequisites.clear();
+            targetProviderTypes.forEach(type -> requiresDatagenEntry(type, requiresDatagenEntry));
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}. Overrides the existing
+         * {@link Map}.
+         *
+         * @param mappedProviderRequisites The {@link Map} of provider requisites to override the existing {@link Map}
+         *                                 with.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public BPWBuilder requiresSetDatagenEntries(Map<ProviderType, Boolean> mappedProviderRequisites) {
+            this.mappedProviderRequisites.clear();
+            this.mappedProviderRequisites.putAll(mappedProviderRequisites);
             return this;
         }
 

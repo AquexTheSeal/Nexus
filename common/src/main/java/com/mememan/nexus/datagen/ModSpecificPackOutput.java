@@ -18,12 +18,17 @@ public class ModSpecificPackOutput extends PackOutput {
         this.shouldGenerate = shouldGenerate;
     }
 
+    @Override
+    public @NotNull Path getOutputFolder(Target outputTarget) {
+        return super.getOutputFolder(outputTarget);
+    }
+
     @NotNull
     public ModData getOwnerMod() {
         return ownerMod;
     }
 
-    public boolean isShouldGenerate() {
+    public boolean shouldGenerate() {
         return shouldGenerate;
     }
 }

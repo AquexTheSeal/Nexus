@@ -14,6 +14,7 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -82,6 +83,11 @@ public class FabricRegistrar implements Registrar {
         }
 
         return () -> targetObject;
+    }
+
+    @Override
+    public @Nullable RegistrySetBuilder getRegistrySetBuilder() {
+        return getDatapackRegistrySetBuilder();
     }
 
     protected <T> Supplier<T> tCastObjSupMappingFunc(Function<? extends BootstapContext<?>, ? extends Supplier<?>> objSupMappingFunc, BootstapContext<T> bootstapContext) { // I love wildcard casts

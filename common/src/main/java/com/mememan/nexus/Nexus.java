@@ -15,6 +15,7 @@ public class Nexus {
         NexusServices.REGISTRAR.setupRegistrar();
 
         if (NexusServices.PLATFORM_MANAGER.getPlatform().equals(ModLoader.FABRIC)) NexusServices.NETWORK_MANAGER.setupNetworkManager();
+        if (NexusServices.PLATFORM_MANAGER.isRunningDataGen()) NexusServices.DATA_GENERATOR.setupDataGenerator();
     }
 
     /**

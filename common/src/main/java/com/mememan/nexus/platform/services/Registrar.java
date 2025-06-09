@@ -4,6 +4,7 @@ import com.mememan.nexus.Nexus;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -163,4 +165,16 @@ public interface Registrar {
      * @see ServerLevel#registryAccess()
      */
     <T> Supplier<ResourceKey<T>> registerDatapackObject(final ResourceLocation objId, Function<BootstapContext<T>, Supplier<T>> objSupMappingFunc, final ResourceKey<Registry<T>> targetDatapackRegistry);
+
+    /**
+     * Gets the current singleton {@link RegistrySetBuilder} responsible for populating datapack entries from registration
+     * code. May be {@code null} if accessed too early (i.e. before the first datapack registrar {@code class} is hit).
+     *
+     * @return The current singleton {@link RegistrySetBuilder} used by Nexus API. May be {@code null}. Usually just a
+     * {@code static} method reference that delegates the value-getting to a lazily-initialized RSB (e.g. this would
+     * probably just {@code return} {@code getDatapackRegistrySetBuilder()}, which would be a lazy init method for the
+     * singleton RSB instance).
+     */
+    @Nullable
+    RegistrySetBuilder getRegistrySetBuilder();
 }

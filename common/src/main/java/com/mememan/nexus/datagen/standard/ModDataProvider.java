@@ -1,5 +1,6 @@
 package com.mememan.nexus.datagen.standard;
 
+import com.mememan.nexus.datagen.ProviderType;
 import net.minecraft.data.DataProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,4 +30,17 @@ public interface ModDataProvider extends DataProvider {
      * entry.
      */
     boolean validateAllEntries();
+
+    /**
+     * The {@link ProviderType} representing this data provider.
+     *
+     * @return The {@link ProviderType} representing this data provider.
+     */
+    @NotNull
+    ProviderType getProviderType();
+
+    @Override
+    default @NotNull String getName() {
+        return " [" + getModId() + "]";
+    }
 }

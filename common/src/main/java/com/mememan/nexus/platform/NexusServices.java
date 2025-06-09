@@ -1,6 +1,7 @@
 package com.mememan.nexus.platform;
 
 import com.mememan.nexus.NexusConstants;
+import com.mememan.nexus.platform.services.DataGenerator;
 import com.mememan.nexus.platform.services.NetworkManager;
 import com.mememan.nexus.platform.services.PlatformManager;
 import com.mememan.nexus.platform.services.Registrar;
@@ -33,7 +34,7 @@ public class NexusServices {
     /**
      * The service responsible for registering and handling all data generation providers/tasks for dependant mods.
      */
- //   public static final DataGenerator DATA_GENERATOR = loadService(DataGenerator.class);
+    public static final DataGenerator DATA_GENERATOR = loadService(DataGenerator.class);
 
     /**
      * Internal service loader method for loading platform-agnostic services.

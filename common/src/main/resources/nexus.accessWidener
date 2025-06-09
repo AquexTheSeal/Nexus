@@ -94,3 +94,9 @@ accessible field net/minecraft/client/model/HierarchicalModel ANIMATION_VECTOR_C
 
 # ServerGamePacketListenerImpl
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;
+
+# RecipeProvider
+extendable method net/minecraft/data/recipes/RecipeProvider getName ()Ljava/lang/String;
+
+# ModelProvider
+extendable method net/minecraft/data/models/ModelProvider getName ()Ljava/lang/String;
