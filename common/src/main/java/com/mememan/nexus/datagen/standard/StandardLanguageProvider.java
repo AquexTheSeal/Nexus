@@ -6,7 +6,7 @@ import com.mememan.nexus.block.standard.BlockPropertyWrapper;
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.datagen.ProviderType;
-import com.mememan.nexus.entity.EntityTypePropertyWrapper;
+import com.mememan.nexus.entity.standard.EntityTypePropertyWrapper;
 import com.mememan.nexus.item.standard.ItemPropertyWrapper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;

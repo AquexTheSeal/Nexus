@@ -1,4 +1,4 @@
-package com.mememan.nexus.entity;
+package com.mememan.nexus.entity.standard;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.mememan.nexus.client.general.ClientDataEntry;
