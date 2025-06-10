@@ -3,6 +3,7 @@ package com.mememan.nexus.internal.services;
 import com.mememan.nexus.asm.annotations.DatagenRegistrarEntry;
 import com.mememan.nexus.datagen.*;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
+import com.mememan.nexus.datagen.standard.StandardLanguageProvider;
 import com.mememan.nexus.datagen.standard.StandardRecipeProvider;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModSide;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -117,12 +119,13 @@ public class ForgeDataGenerator implements DataGenerator {
                 ModSpecificPackOutput modSpecificPackOutput = new ModSpecificPackOutput(formattedOutputPath, curModData, allowDatagenForMod);
                 Set<ProviderType> providersToValidate = modDatagenConfig == null || modDatagenConfig.providerTypesToFullyValidate() == null ? Set.of() : modDatagenConfig.providerTypesToFullyValidate();
                 Set<ProviderType> disabledProviders = modDatagenConfig == null || modDatagenConfig.disabledProviderTypes() == null ? Set.of() : modDatagenConfig.disabledProviderTypes();
-                DuplicateDataPolicy dupeStrat = modDatagenConfig == null || modDatagenConfig.dupeStrat() == null ? DuplicateDataPolicy.CRASH : modDatagenConfig.dupeStrat();
+                Map<ProviderType, DuplicateDataPolicy> mappedDupeStrats = modDatagenConfig == null || modDatagenConfig.mappedDupeStrats() == null ? Map.of() : modDatagenConfig.mappedDupeStrats();
 
                 // Client
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.LANGUAGE_PROVIDER) && onClient, new StandardLanguageProvider(modSpecificPackOutput, modId, "en_us", providersToValidate.contains(NexusProviderTypes.LANGUAGE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, DuplicateDataPolicy.CRASH)));
 
                 // Server
-                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), dupeStrat));
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.RECIPE_PROVIDER, DuplicateDataPolicy.CRASH)));
             });
 
             HAS_CONSUMED_GENERATORS = true;

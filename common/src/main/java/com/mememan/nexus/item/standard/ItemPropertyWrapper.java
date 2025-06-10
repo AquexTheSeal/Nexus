@@ -114,7 +114,7 @@ public class ItemPropertyWrapper {
      * Template IPWs are not stored in {@link #MAPPED_IPWS} and do not store a parent {@link Item}. They're particularly
      * useful for re-using across multiple {@linkplain Item Items}.
      *
-     * @param parentTemplateWrapper The parent {@link ItemPropertyWrapper} template from which {{@link #builder()}} data
+     * @param parentTemplateWrapper The parent {@link ItemPropertyWrapper} template from which {@link #builder()} data
      *                              should be copied.
      *
      * @return A new {@link ItemPropertyWrapper} instance, set as a template, inheriting from the provided IPW template.
@@ -187,7 +187,8 @@ public class ItemPropertyWrapper {
      *
      * @param newItemRegName The new registry name by which the newly constructed {@code Supplier<Item>} instance will
      *                       be stored.
-     * @param parentItem The parent {@code Supplier<Item>} stored in {@link #MAPPED_IPWS}.
+     * @param parentItem The parent {@code Supplier<Item>} stored in {@link #MAPPED_IPWS}. Must already be a registered
+     *                   {@link Item}.
      *
      * @return A new {@link ItemPropertyWrapper} instance with copied properties (including {@link Item.Properties})
      * based on the provided {@code Supplier<Item>}, or an entirely new/clean instance if no such IPW exists.
@@ -233,6 +234,7 @@ public class ItemPropertyWrapper {
                 .asCompostable(from.builder.itemCompostingMappingFunc)
                 .asFuel(from.builder.itemFuelMappingFunc)
                 .literalTranslation(from.builder.literalTranslation)
+                .bypassDefaultTranslation(from.builder.bypassDefaultTranslation)
                 .withSetModelPredicates(Map.copyOf(from.builder.itemModelPredicates))
                 .excludeFromNativeDatagen(from.builder.excludeFromNativeDatagen)
                 .requiresSetDatagenEntries(Map.copyOf(from.builder.mappedProviderRequisites))
@@ -295,6 +297,15 @@ public class ItemPropertyWrapper {
      */
     public boolean hasLiteralTranslation() {
         return builder != null && builder.literalTranslation;
+    }
+
+    /**
+     * Gets whether this IPW instance bypasses default translation altogether.
+     *
+     * @return Whether this IPW instance bypasses default translation altogether.
+     */
+    public boolean bypassDefaultTranslation() {
+        return builder != null && builder.bypassDefaultTranslation;
     }
 
     /**
@@ -465,6 +476,7 @@ public class ItemPropertyWrapper {
         @Nullable
         private Function<String, String> itemTranslationFunc;
         private boolean literalTranslation = false;
+        private boolean bypassDefaultTranslation = false;
         private final Object2ObjectOpenHashMap<ResourceLocation, WrappedClampedItemPropertyFunction> itemModelPredicates = new Object2ObjectOpenHashMap<>();
         private boolean excludeFromNativeDatagen = false;
         private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
@@ -510,6 +522,9 @@ public class ItemPropertyWrapper {
          * @return {@code this} (builder method).
          *
          * @see #withCustomSeparatorWords(List)
+         * @see #withLocalization(Function)
+         * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
          */
         public IPWBuilder withCustomName(String manuallyLocalizedItemName) {
             this.manuallyLocalizedItemName = manuallyLocalizedItemName;
@@ -532,6 +547,7 @@ public class ItemPropertyWrapper {
          * @see #withCustomName(String)
          * @see #withLocalization(Function)
          * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
          */
         public IPWBuilder withCustomSeparatorWords(List<String> definedSeparatorWords) {
             this.definedSeparatorWords = definedSeparatorWords;
@@ -554,10 +570,43 @@ public class ItemPropertyWrapper {
          * @see #withCustomName(String)
          * @see #withLocalization(Function)
          * @see #literalTranslation()
+         * @see #bypassDefaultTranslation(boolean)
          */
         public IPWBuilder literalTranslation(boolean literalTranslation) {
             this.literalTranslation = literalTranslation;
             return this;
+        }
+
+        /**
+         * Whether this IPWBuilder instance should skip the translation process altogether.
+         * <br></br>
+         * Note that data won't be generated for this instance (NPEs may be thrown too, based on the validation policy
+         * for your mod) unless {@link #literalTranslation(boolean)} is marked as {@code true} or {@link #withCustomName(String)}
+         * is set to a non-{@code null} value.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation()
+         */
+        public IPWBuilder bypassDefaultTranslation(boolean bypassDefaultTranslation) {
+            this.bypassDefaultTranslation = bypassDefaultTranslation;
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #bypassDefaultTranslation(boolean)}, marking this builder to be skipped by the
+         * default localization algorithm Nexus API employs. See the base variant for more info.
+         *
+         * @return {@link #bypassDefaultTranslation(boolean)}
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public IPWBuilder bypassDefaultTranslation() {
+            return bypassDefaultTranslation(true);
         }
 
         /**

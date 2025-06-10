@@ -66,7 +66,7 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
                     NexusConstants.LOGGER.debug("[{}] [Generating Block Recipe]: {}", modId, blockSupEntry.get().getDescriptionId());
 
                     mappedRecipe.apply(recipeActionConsumer).accept(blockSupEntry);
-                } else if (validateAllEntries() || bpwEntry.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) throw new NullPointerException(String.format("Missing recipe for block: %s, required by mod: %s, either because validateAllEntries is set to true for this provider or the block itself requires validation through BlockPropertyWrapper#getProviderRequisites().", blockSupEntry.get().getDescriptionId(), modId));
+                } else if (validateAllEntries() || bpwEntry.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) throw new NullPointerException(String.format("Missing recipe for block: %s, required by mod: %s, either because validateAllEntries is set to true for this provider or the block itself requires validation through BlockPropertyWrapper#getProviderTypeRequisites().", blockSupEntry.get().getDescriptionId(), modId));
             });
         }
 
@@ -78,7 +78,7 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
                     NexusConstants.LOGGER.debug("[{}] [Generating Item Recipe]: {}", modId, itemSupEntry.get().getDescriptionId());
 
                     mappedRecipe.apply(recipeActionConsumer).accept(itemSupEntry);
-                } else if (validateAllEntries() || ipwEntry.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) throw new NullPointerException(String.format("Missing recipe for item: %s, required by mod: %s, either because validateAllEntries is set to true for this provider or the item itself requires validation through ItemPropertyWrapper#getProviderRequisites().", itemSupEntry.get().getDescriptionId(), modId));
+                } else if (validateAllEntries() || ipwEntry.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) throw new NullPointerException(String.format("Missing recipe for item: %s, required by mod: %s, either because validateAllEntries is set to true for this provider or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites().", itemSupEntry.get().getDescriptionId(), modId));
             });
         }
     }

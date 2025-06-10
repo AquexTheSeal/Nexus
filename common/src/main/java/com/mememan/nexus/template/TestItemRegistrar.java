@@ -39,10 +39,6 @@ public class TestItemRegistrar {
             .asFuel(I -> 200)
             .withParentCreativeModeTab(() -> CreativeModeTabs.allTabs().get(3))
             .withTag(() -> ItemTags.ACACIA_LOGS)
-            .withRecipe(r -> result -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, result.get())
-                    .requires(Items.ACACIA_BOAT)
-                    .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(Items.ACACIA_BOAT).getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(Items.ACACIA_BOAT))
-                    .save(r, new ResourceLocation("nexus", "test_item")))
             .build()
             .getParentItem();
     

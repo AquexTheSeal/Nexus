@@ -1,5 +1,6 @@
 package com.mememan.nexus.datagen.standard;
 
+import com.google.gson.JsonObject;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.block.standard.BlockPropertyWrapper;
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
@@ -11,6 +12,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
@@ -48,32 +50,79 @@ public class StandardLanguageProvider implements ModDataProvider {
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.BLOCK.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
                 .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
+                .peek(curEntry -> {
+                    BlockPropertyWrapper curBPW = curEntry.getValue();
+
+                    if (validateAllEntries() || curBPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                        if (curBPW.bypassDefaultTranslation() && curBPW.hasLiteralTranslation() && curBPW.getManuallyLocalizedBlockName() == null) {
+                            throw new NullPointerException(String.format("Missing %s locale entry for block %s, required by mod: %s, either because validateAllEntries is set to true or the block itself requires validation through BlockPropertyWrapper#getProviderTypeRequisites()", locale, curEntry.getKey().get().getDescriptionId(), modId));
+                        }
+                    }
+                })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
         this.mappedModIPWs = ItemPropertyWrapper.getMappedIpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.ITEM.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
                 .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
+                .peek(curEntry -> {
+                    ItemPropertyWrapper curIPW = curEntry.getValue();
+
+                    if (validateAllEntries() || curIPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                        if (curIPW.bypassDefaultTranslation() && curIPW.hasLiteralTranslation() && curIPW.getManuallyLocalizedItemName() == null) {
+                            throw new NullPointerException(String.format("Missing %s locale entry for item %s, required by mod: %s, either because validateAllEntries is set to true or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites()", locale, curEntry.getKey().get().getDescriptionId(), modId));
+                        }
+                    }
+                })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
         this.mappedModETPWs = EntityTypePropertyWrapper.getMappedEtpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.ENTITY_TYPE.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
                 .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
+                .peek(curEntry -> {
+                    EntityTypePropertyWrapper<?> curETPW = curEntry.getValue();
+
+                    if (validateAllEntries() || curETPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                        if (curETPW.bypassDefaultTranslation() && curETPW.hasLiteralTranslation() && curETPW.getManuallyLocalizedItemName() == null) {
+                            throw new NullPointerException(String.format("Missing %s locale entry for entity type %s, required by mod: %s, either because validateAllEntries is set to true or the item itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites()", locale, curEntry.getKey().get().getDescriptionId(), modId));
+                        }
+                    }
+                })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
     }
 
     protected void addTranslations() {
+        // Native types
+        handleBlockTranslations();
+        handleEntityTypeTranslations();
+        handleItemTranslations();
+
+        // Misc. types
 
     }
 
-    protected void validatePossibleTranslationEntries() {
+    protected void handleBlockTranslations() {
+
+    }
+
+    protected void handleEntityTypeTranslations() {
+
+    }
+
+    protected void handleItemTranslations() {
 
     }
 
     @Override
-    public CompletableFuture<?> run(CachedOutput cachedOutput) {
+    public @NotNull CompletableFuture<?> run(CachedOutput cachedOutput) {
         addTranslations();
 
+        if (!localizationEntries.isEmpty()) { // Effectively taken from Forge (well, rest of the provider is rewritten to fit our purposes in this case)
+            JsonObject targetJson = new JsonObject();
 
+            localizationEntries.forEach(targetJson::addProperty);
+
+            return DataProvider.saveStable(cachedOutput, targetJson, outputPath);
+        }
 
         return CompletableFuture.allOf();
     }
@@ -152,11 +201,11 @@ public class StandardLanguageProvider implements ModDataProvider {
 
         if (isAlreadyMapped) {
             switch (dupeStrat) {
-                case CRASH -> throw new IllegalStateException(String.format("Attempted to localize duplicate translation key (%s -> %s) from mod of ID %s, specified DuplicateDataPolicy is CRASH.", unlocalizedKey, localizedValue, getModId()));
-                case EXCLUDE_WARN -> NexusConstants.LOGGER.warn("Attempted to localize duplicate translation key ({} -> {}) from mod of ID {}, specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", unlocalizedKey, localizedValue, getModId());
+                case CRASH -> throw new IllegalStateException(String.format("Attempted to localize duplicate translation key (original: %s -> %s | duplicate: %s -> %s) from mod of ID %s, specified DuplicateDataPolicy is CRASH.", unlocalizedKey, localizationEntries.get(unlocalizedKey), unlocalizedKey, localizedValue, getModId()));
+                case EXCLUDE_WARN -> NexusConstants.LOGGER.warn("Attempted to localize duplicate translation key (original: {} -> {} | duplicate: {} -> {}) from mod of ID {}, specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", unlocalizedKey, localizationEntries.get(unlocalizedKey), unlocalizedKey, localizedValue, getModId());
                 case EXCLUDE_SILENT -> {}
                 case OVERRIDE_WARN -> {
-                    NexusConstants.LOGGER.warn("Overriding duplicate translation key ({} -> {}) from mod of ID {}, specified DuplicateDataPolicy is OVERRIDE_WARN.", unlocalizedKey, localizedValue, getModId());
+                    NexusConstants.LOGGER.warn("Overriding duplicate translation key (original: {} -> {} | duplicate (new): {} -> {}) from mod of ID {}, specified DuplicateDataPolicy is OVERRIDE_WARN.", unlocalizedKey, localizationEntries.get(unlocalizedKey), unlocalizedKey, localizedValue, getModId());
 
                     localizationEntries.put(unlocalizedKey, localizedValue);
                 }

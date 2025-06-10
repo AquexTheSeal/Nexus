@@ -193,6 +193,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
                 .withClientDataEntry(from.builder.clientDataEntry)
                 .withSetTags(List.copyOf(from.builder.parentTags))
                 .literalTranslation(from.builder.literalTranslation)
+                .bypassDefaultTranslation(from.builder.bypassDefaultTranslation)
                 .excludeFromNativeDatagen(from.builder.excludeFromNativeDatagen)
                 .requiresSetDatagenEntries(Map.copyOf(from.builder.mappedProviderRequisites))
                 .build(); // Direct setting of the builder would copy the entire object itself, which would in-turn overwrite it if any calls are made to the copied ETPW afterward
@@ -248,6 +249,15 @@ public class EntityTypePropertyWrapper<E extends Entity> {
      */
     public boolean hasLiteralTranslation() {
         return builder != null && builder.literalTranslation;
+    }
+
+    /**
+     * Gets whether this ETPW instance bypasses default translation altogether.
+     *
+     * @return Whether this ETPW instance bypasses default translation altogether.
+     */
+    public boolean bypassDefaultTranslation() {
+        return builder != null && builder.bypassDefaultTranslation;
     }
 
     /**
@@ -380,6 +390,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
         @Nullable
         private Function<String, String> entityTypeTranslationFunc;
         private boolean literalTranslation = false;
+        private boolean bypassDefaultTranslation = false;
         private Supplier<AttributeSupplier.Builder> attribBuilder;
         private Supplier<ClientDataEntry> clientDataEntry;
         private boolean excludeFromNativeDatagen = false;
@@ -426,6 +437,9 @@ public class EntityTypePropertyWrapper<E extends Entity> {
          * @return {@code this} (builder method).
          *
          * @see #withCustomSeparatorWords(List)
+         * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
+         * @see #withLocalization(Function)
          */
         public ETPWBuilder<E> withCustomName(String manuallyLocalizedItemName) {
             this.manuallyLocalizedItemName = manuallyLocalizedItemName;
@@ -446,6 +460,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
          * @see #withCustomName(String)
          * @see #withLocalization(Function)
          * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
          */
         public ETPWBuilder<E> withCustomSeparatorWords(List<String> definedSeparatorWords) {
             this.definedSeparatorWords = definedSeparatorWords;
@@ -463,10 +478,43 @@ public class EntityTypePropertyWrapper<E extends Entity> {
          * @see #withCustomName(String)
          * @see #withLocalization(Function)
          * @see #literalTranslation()
+         * @see #bypassDefaultTranslation(boolean)
          */
         public ETPWBuilder<E> literalTranslation(boolean literalTranslation) {
             this.literalTranslation = literalTranslation;
             return this;
+        }
+
+        /**
+         * Whether this ETPWBuilder instance should skip the translation process altogether.
+         * <br></br>
+         * Note that data won't be generated for this instance (NPEs may be thrown too, based on the validation policy
+         * for your mod) unless {@link #literalTranslation(boolean)} is marked as {@code true} or {@link #withCustomName(String)}
+         * is set to a non-{@code null} value.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation()
+         */
+        public ETPWBuilder<E> bypassDefaultTranslation(boolean bypassDefaultTranslation) {
+            this.bypassDefaultTranslation = bypassDefaultTranslation;
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #bypassDefaultTranslation(boolean)}, marking this builder to be skipped by the
+         * default localization algorithm Nexus API employs. See the base variant for more info.
+         *
+         * @return {@link #bypassDefaultTranslation(boolean)}
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public ETPWBuilder<E> bypassDefaultTranslation() {
+            return bypassDefaultTranslation(true);
         }
 
         /**

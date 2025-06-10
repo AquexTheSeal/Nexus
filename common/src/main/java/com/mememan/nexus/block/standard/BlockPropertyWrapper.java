@@ -224,6 +224,8 @@ public class BlockPropertyWrapper {
         if (from.builder == null) return to;
         return to.builder()
                 .withCustomName(from.builder.manuallyLocalizedBlockName)
+                .literalTranslation(from.builder.literalTranslation)
+                .bypassDefaultTranslation(from.builder.bypassDefaultTranslation)
                 .withCustomSeparatorWords(from.builder.definedSeparatorWords)
                 .withLocalization(from.builder.blockTranslationFunc)
                 .withSetTags(List.copyOf(from.builder.parentTags))
@@ -304,6 +306,15 @@ public class BlockPropertyWrapper {
      */
     public boolean hasLiteralTranslation() {
         return builder != null && builder.literalTranslation;
+    }
+
+    /**
+     * Gets whether this BPW instance bypasses default translation altogether.
+     *
+     * @return Whether this BPW instance bypasses default translation altogether.
+     */
+    public boolean bypassDefaultTranslation() {
+        return builder != null && builder.bypassDefaultTranslation;
     }
 
     /**
@@ -613,6 +624,7 @@ public class BlockPropertyWrapper {
         @Nullable
         private Function<String, String> blockTranslationFunc;
         private boolean literalTranslation = false;
+        private boolean bypassDefaultTranslation = false;
         private boolean excludeFromNativeDatagen = false;
         private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
 
@@ -664,6 +676,7 @@ public class BlockPropertyWrapper {
          * @see #withCustomSeparatorWords(List)
          * @see #withLocalization(Function)
          * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
          */
         public BPWBuilder withCustomName(String manuallyLocalizedBlockName) {
             this.manuallyLocalizedBlockName = manuallyLocalizedBlockName;
@@ -681,6 +694,7 @@ public class BlockPropertyWrapper {
          * @see #withCustomName(String)
          * @see #withLocalization(Function)
          * @see #literalTranslation()
+         * @see #bypassDefaultTranslation(boolean)
          */
         public BPWBuilder literalTranslation(boolean literalTranslation) {
             this.literalTranslation = literalTranslation;
@@ -713,6 +727,38 @@ public class BlockPropertyWrapper {
          */
         public BPWBuilder literalTranslation() {
             return literalTranslation(true);
+        }
+
+        /**
+         * Whether this BPWBuilder instance should skip the translation process altogether.
+         * <br></br>
+         * Note that data won't be generated for this instance (NPEs may be thrown too, based on the validation policy
+         * for your mod) unless {@link #literalTranslation(boolean)} is marked as {@code true} or {@link #withCustomName(String)}
+         * is set to a non-{@code null} value.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation()
+         */
+        public BPWBuilder bypassDefaultTranslation(boolean bypassDefaultTranslation) {
+            this.bypassDefaultTranslation = bypassDefaultTranslation;
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #bypassDefaultTranslation(boolean)}, marking this builder to be skipped by the
+         * default localization algorithm Nexus API employs. See the base variant for more info.
+         *
+         * @return {@link #bypassDefaultTranslation(boolean)}
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public BPWBuilder bypassDefaultTranslation() {
+            return bypassDefaultTranslation(true);
         }
 
         /**
