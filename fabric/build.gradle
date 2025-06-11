@@ -4,9 +4,16 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_id}-${mod_version}-${minecraft_version}-fabric"
+    archivesName = "${mod_id}-fabric"
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+    withSourcesJar()
+    withJavadocJar()
 }
 
 dependencies {
@@ -93,11 +100,11 @@ processResources {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            group = mod_group
             artifactId = base.archivesName.get()
             version = mod_version
 
-            artifact jar
-            artifact sourcesJar
+            from components.java
         }
     }
 }

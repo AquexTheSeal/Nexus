@@ -9,9 +9,10 @@ import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModSide;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.DataGenerator;
+import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -34,10 +36,22 @@ public class ForgeDataGenerator implements DataGenerator {
     private static net.minecraft.data.DataGenerator CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE;
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends Pair<Boolean, ? extends DataProvider>>>> ENQUEUED_PROVIDERS = new ConcurrentLinkedQueue<>();
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends ModDataProvider>>> ENQUEUED_MOD_PROVIDERS = new ConcurrentLinkedQueue<>();
-    private static final ObjectOpenHashSet<ModDatagenConfig> MOD_DATAGEN_CONFIGS = new ObjectOpenHashSet<>();
+    private static final ObjectOpenCustomHashSet<ModDatagenConfig> MOD_DATAGEN_CONFIGS = new ObjectOpenCustomHashSet<>(new Hash.Strategy<>() {
+        @Override
+        public int hashCode(ModDatagenConfig o) {
+            return Objects.hash(o.modId());
+        }
+
+        @Override
+        public boolean equals(ModDatagenConfig a, ModDatagenConfig b) {
+            return a != null && b != null && Objects.equals(a.modId(), b.modId());
+        }
+    });
 
     @Override
     public void setupDataGenerator() {
+        NexusServices.PLATFORM_MANAGER.discoverAnnotatedClasses(DatagenRegistrarEntry.class); // Early discovery to ensure presence of configs and/or external data providers
+
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modBus.addListener(ForgeDataGenerator::onGatherDataEvent);
@@ -82,10 +96,8 @@ public class ForgeDataGenerator implements DataGenerator {
         boolean onClient = event.includeClient();
         boolean onServer = event.includeServer();
 
-        if (!hasConsumedGenerators()) { // Safeguard against potentially running this more than once for any reason, even though GatherDataEvent is only ever initialized once in DatagenModLoader#begin
+        if (!hasConsumedGenerators()) { // Safeguard against potentially running this more than once for any reason
             CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE = primaryGen;
-
-            NexusServices.PLATFORM_MANAGER.discoverAnnotatedClasses(DatagenRegistrarEntry.class);
 
             // ModDataProvider types
             if (!ENQUEUED_MOD_PROVIDERS.isEmpty()) {
@@ -95,7 +107,7 @@ public class ForgeDataGenerator implements DataGenerator {
                     ModData targetMod = NexusServices.PLATFORM_MANAGER.getModDataById(modProviderMapper.left());
                     String targetModId = targetMod.getModMetadata().modId();
                     ModDatagenConfig targetModConfig = NexusServices.DATA_GENERATOR.getConfigForMod(targetModId);
-                    boolean allowDatagenForMod = targetModConfig == null || targetModConfig.enableDatagen();
+                    boolean allowDatagenForMod = targetModConfig != null && targetModConfig.enableDatagen();
                     ModSpecificPackOutput modSpecificPackOutput = new ModSpecificPackOutput(formattedOutputPath, targetMod, allowDatagenForMod);
                     ModDataProvider mappedModProvider = modProviderMapper.right().apply(modSpecificPackOutput, regLookupProvider);
                     ProviderType mappedModProviderType = mappedModProvider.getProviderType();
@@ -115,7 +127,7 @@ public class ForgeDataGenerator implements DataGenerator {
             NexusServices.PLATFORM_MANAGER.getModData().forEach(curModData -> {
                 String modId = curModData.getModMetadata().modId();
                 ModDatagenConfig modDatagenConfig = NexusServices.DATA_GENERATOR.getConfigForMod(modId);
-                boolean allowDatagenForMod = modDatagenConfig == null || modDatagenConfig.enableDatagen();
+                boolean allowDatagenForMod = modDatagenConfig != null && modDatagenConfig.enableDatagen();
                 ModSpecificPackOutput modSpecificPackOutput = new ModSpecificPackOutput(formattedOutputPath, curModData, allowDatagenForMod);
                 Set<ProviderType> providersToValidate = modDatagenConfig == null || modDatagenConfig.providerTypesToFullyValidate() == null ? Set.of() : modDatagenConfig.providerTypesToFullyValidate();
                 Set<ProviderType> disabledProviders = modDatagenConfig == null || modDatagenConfig.disabledProviderTypes() == null ? Set.of() : modDatagenConfig.disabledProviderTypes();

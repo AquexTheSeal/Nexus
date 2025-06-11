@@ -1,5 +1,6 @@
 package com.mememan.nexus.datagen;
 
+import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.loader.ModData;
 import net.minecraft.data.PackOutput;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +20,11 @@ public class ModSpecificPackOutput extends PackOutput {
     }
 
     @Override
-    public @NotNull Path getOutputFolder(Target outputTarget) {
-        return super.getOutputFolder(outputTarget);
+    public @NotNull Path getOutputFolder() {
+        Path rootFolder = super.getOutputFolder();
+
+        // Handle edge case for more than 1 data gatherer being present
+        return rootFolder.endsWith(NexusConstants.MOD_ID) ? rootFolder.resolveSibling(ownerMod.getModMetadata().modId()) : rootFolder;
     }
 
     @NotNull

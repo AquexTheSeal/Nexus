@@ -84,6 +84,9 @@ public interface DataGenerator {
     /**
      * Registers a {@link ModDatagenConfig}. Allows for more flexibility and control over how Nexus API handles datagen
      * for specific mods.
+     * <br></br>
+     * You cannot have more than 1 config registered for a mod at any given time. If an attempt is made to registered
+     * additional configs tied to the same mod ID, the originally-registered config will take precedence.
      *
      * @param modDatagenConfig The datagen config to register.
      *
@@ -92,24 +95,37 @@ public interface DataGenerator {
     ModDatagenConfig registerConfigForMod(ModDatagenConfig modDatagenConfig);
 
     /**
+     * Gets the existing {@link Set} of datagen configs for mods intending to utilise Nexus' datagen.
+     * <br></br>
+     * If this {@link Set} happens to be empty, Nexus will skip running its providers altogether.
      *
-     *
-     * @return
+     * @return The {@link Set} of {@linkplain ModDatagenConfig ModDatagenConfigs} Nexus API uses to run its providers.
+     * May be empty.
      */
     Set<ModDatagenConfig> getModDatagenConfigs();
 
+    /**
+     * Gets the {@link ModDatagenConfig} associated with the {@code modId} passed in. May be {@code null} if no such
+     * config is registered or {@link #getModDatagenConfigs()} is empty.
+     *
+     * @param modId The mod ID of the target mod to try and get the {@link ModDatagenConfig} for.
+     *
+     * @return The associated {@link ModDatagenConfig}, or {@code null} if no such config exists for the given mod ID.
+     */
     @Nullable
     default ModDatagenConfig getConfigForMod(String modId) {
-        return getModDatagenConfigs().stream()
+        return getModDatagenConfigs().isEmpty() ? null : getModDatagenConfigs().stream()
                 .filter(curConfig -> curConfig.modId().equals(modId))
                 .findFirst()
                 .orElse(null);
     }
 
     /**
+     * Computes a {@link HashMultimap} of disabled {@linkplain ProviderType ProviderTypes} pertaining to their respective
+     * mod IDs via {@link #getModDatagenConfigs()}.
      *
-     *
-     * @return
+     * @return A {@link HashMultimap} of disabled {@linkplain ProviderType ProviderTypes} mapped to their mod IDs. May be
+     * empty.
      */
     default HashMultimap<String, ProviderType> getDisabledDataProviders() {
         HashMultimap<String, ProviderType> mappedDisabledProviders = HashMultimap.create();
@@ -126,9 +142,12 @@ public interface DataGenerator {
     }
 
     /**
+     * Computes an {@link ObjectOpenHashSet} of mods whose configs explicitly specify that Nexus API should not generate
+     * data or register providers for them. Note that this does not include mods whose configs are {@code null}/haven't
+     * been declared.
      *
-     *
-     * @return
+     * @return An {@link ObjectOpenHashSet} of mods whose configs explicitly specify that Nexus API should not generate
+     * data or register providers for them, using {@link #getModDatagenConfigs()}. May be empty
      */
     default ObjectOpenHashSet<ModDatagenConfig> getDisabledMods() {
         return getModDatagenConfigs().isEmpty() ? ObjectOpenHashSet.of() : getModDatagenConfigs().stream()

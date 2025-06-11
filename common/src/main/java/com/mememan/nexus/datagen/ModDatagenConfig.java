@@ -10,6 +10,7 @@ import java.util.Set;
  * should take place for a given mod by its mod ID.
  * <br></br>
  * Only useful for Nexus API datagen. External implementations utilising this object are left to the end-developer.
+ * Needed in order to allow Nexus API to generate data for any given mod.
  *
  * @param modId The parent mod ID under which the specified data should be configured/stored.
  * @param enableDatagen Whether Nexus API should generate any data for the specified mod ID. If disabled, both native

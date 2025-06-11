@@ -3,6 +3,9 @@ package com.mememan.nexus.client.general;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Wrapper {@code class} for storing side-safe client-only data.
+ */
 public class ClientDataEntry {
     private static final ObjectArrayList<ClientDataEntry> MAPPED_CDES = new ObjectArrayList<>();
 
@@ -10,6 +13,9 @@ public class ClientDataEntry {
 
     }
 
+    /**
+     * Builder {@code class} used to build and store client data (such as tooltips, renderers, models, etc.).
+     */
     public static class CDEBuilder {
         @NotNull
         private final ClientDataEntry ownerEntry;

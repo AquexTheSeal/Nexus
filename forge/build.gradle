@@ -6,7 +6,14 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_id}-${mod_version}-${minecraft_version}-forge"
+    archivesName = "${mod_id}-forge"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+    withSourcesJar()
+    withJavadocJar()
 }
 
 mixin {
@@ -19,6 +26,7 @@ mixin {
 minecraft {
     mappings channel: "${forge_mappings_channel}", version: "${forge_mappings_channel_version}"
 
+    reobf = false
     copyIdeResources = true
 
     if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
@@ -97,6 +105,8 @@ minecraft {
 
 sourceSets.main.resources.srcDir(project(':common').file('src/generated/resources'))
 
+jarJar.enable()
+
 dependencies {
     // Base
     minecraft("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
@@ -142,16 +152,23 @@ processResources {
     from project(':common').file('src/generated/resources/')
 }
 
-jar.finalizedBy('reobfJar')
+jar {
+    manifest {
+        attributes([
+                'MixinConfigs': "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+        ])
+    }
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            group = mod_group
             artifactId = base.archivesName.get()
             version = mod_version
 
-            artifact jar
-            artifact sourcesJar
+            from components.java
+            jarJar.component(it)
         }
     }
 }

@@ -238,7 +238,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
      *
      * @return The manually localized entity type name, or an empty {@code String} if the {@link #builder()} is {@code null}.
      */
-    public String getManuallyLocalizedItemName() {
+    public String getManuallyLocalizedEntityTypeName() {
         return builder == null ? "" : builder.manuallyLocalizedItemName;
     }
 

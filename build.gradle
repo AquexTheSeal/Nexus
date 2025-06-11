@@ -205,7 +205,7 @@ subprojects {
             if (useLocal) mavenLocal()
             else {
                 maven {
-                    name = "cloudsmith"
+                    name = "Cloudsmith"
                     url = "https://api.cloudsmith.io/maven/meme-man-mods/nexus/"
 
                     credentials {
