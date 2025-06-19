@@ -8,12 +8,10 @@ import com.mememan.nexus.datagen.ProviderType;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
@@ -627,6 +625,7 @@ public class BlockPropertyWrapper {
         private boolean bypassDefaultTranslation = false;
         private boolean excludeFromNativeDatagen = false;
         private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
+        private final Object2ObjectOpenHashMap<Component, String> blockTooltips = new Object2ObjectOpenHashMap<>();
 
         private BPWBuilder(BlockPropertyWrapper ownerWrapper, Supplier<Block> parentBlock) {
             this.ownerWrapper = ownerWrapper;
@@ -1273,6 +1272,10 @@ public class BlockPropertyWrapper {
             this.mappedProviderRequisites.clear();
             this.mappedProviderRequisites.putAll(mappedProviderRequisites);
             return this;
+        }
+
+        public BPWBuilder withBlockToolTip(Component component) {
+
         }
 
         /**

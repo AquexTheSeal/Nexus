@@ -9,7 +9,7 @@ import com.mememan.nexus.platform.services.Registrar;
 import java.util.ServiceLoader;
 
 /**
- * Centralized service loader for Nexus API. This is the primary access points for all platform-agnostic services.
+ * Centralized service loader for Nexus API. This is the primary access point for all platform-agnostic services.
  * <br></br>
  * Dependant mods should ensure that, when using these services, they do things under their own namespaces/Mod IDs
  * where appropriate (e.g. object registration).

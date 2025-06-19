@@ -40,9 +40,10 @@ public interface DataGenerator {
     void setupDataGenerator();
 
     /**
-     * Registers a {@link DataProvider} with minimal context (using only a {@link PackOutput}). Providers are run based
-     * on their own data, meaning that if you were to pass a {@link ModDataProvider} subtype, it would output data based
-     * on the {@link ModDataProvider#getModId()} specified within the output {@code DP's} constructor.
+     * Registers a {@link DataProvider} with minimal context (using only a {@link PackOutput} and
+     * {@code CompletableFuture<HolderLookup.Provider>}). Providers are run based on their own data, meaning that if you
+     * were to pass a {@link ModDataProvider} subtype, it would output data based on the {@link ModDataProvider#getModId()}
+     * specified within the output {@code DP's} constructor.
      * <br></br>
      * If you're registering loader-specific data providers that require loader-specific parameters beyond what vanilla
      * (or your own code) offers, you should use your respective loader to register them as necessary. Nexus only aims to
@@ -65,6 +66,8 @@ public interface DataGenerator {
      * @implNote Loader-specific implementations will ignore the left output {@code boolean} if the {@code DP} is an
      * instance of {@linkplain ModDataProvider}, since {@linkplain ModDataProvider#getProviderType()} would be used to
      * validate sides instead.
+     *
+     * @see #registerModDataProvider(String, BiFunction)
      */
     <DP extends DataProvider> void registerDataProvider(String modId, final BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, Pair<Boolean, DP>> dataProvider);
 

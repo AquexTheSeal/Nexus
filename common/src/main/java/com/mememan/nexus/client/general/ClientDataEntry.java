@@ -2,15 +2,23 @@ package com.mememan.nexus.client.general;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper {@code class} for storing side-safe client-only data.
  */
 public class ClientDataEntry {
     private static final ObjectArrayList<ClientDataEntry> MAPPED_CDES = new ObjectArrayList<>();
+    private final boolean isTemplate;
+    @Nullable
+    private CDEBuilder builder;
+
+    private ClientDataEntry(boolean isTemplate) {
+        this.isTemplate = isTemplate;
+    }
 
     private ClientDataEntry() {
-
+        this(true);
     }
 
     /**

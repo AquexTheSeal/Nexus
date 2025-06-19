@@ -34,7 +34,7 @@ public class TestItemRegistrar {
             .bypassDefaultTranslation()
             .build()
             .getParentItem();
-    public static final Supplier<Item> TEST_ITEM_2 = ItemPropertyWrapper.create(registerItem(new ResourceLocation("forge", "test_item_2"), () -> new Item(new Item.Properties())))
+    public static final Supplier<Item> TEST_ITEM_2 = ItemPropertyWrapper.create(registerItem(new ResourceLocation("nexus", "test_item_2"), () -> new Item(new Item.Properties())))
             .builder()
             .asCompostable(I -> 20.0F)
             .asFuel(I -> 200)
@@ -43,7 +43,7 @@ public class TestItemRegistrar {
             .withRecipe(r -> result -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, result.get())
                     .requires(Items.ACACIA_BOAT)
                     .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(Items.ACACIA_BOAT).getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(Items.ACACIA_BOAT))
-                    .save(r, new ResourceLocation("forge", "test_item")))
+                    .save(r, new ResourceLocation("nexus", "test_item_2")))
             .build()
             .getParentItem();
     
