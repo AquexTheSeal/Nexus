@@ -2,6 +2,7 @@ package com.mememan.nexus.platform.services;
 
 import com.mememan.nexus.Nexus;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
+import com.mememan.nexus.loader.StandardRegistryBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
@@ -10,7 +11,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -162,9 +162,33 @@ public interface Registrar {
      * found in {@link Level} instances), as per MC's datapack value-storing conventions.
      *
      * @see Registries
-     * @see ServerLevel#registryAccess()
+     * @see Level#registryAccess()
      */
     <T> Supplier<ResourceKey<T>> registerDatapackObject(final ResourceLocation objId, Function<BootstapContext<T>, Supplier<T>> objSupMappingFunc, final ResourceKey<Registry<T>> targetDatapackRegistry);
+
+    /**
+     * Attempts to register a standard {@link Registry} using the {@code registryBuilder} passed in, leveraging additional
+     * configurations made within said builder.
+     *
+     * @param registryBuilder The {@link StandardRegistryBuilder} by which the {@link Registry} to create and register
+     *                        should be configured.
+     *
+     * @return The newly-registered {@link Registry}.
+     *
+     * @param <T> The object type within the {@link Registry} (e.g. {@link Item}).
+     * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
+     */
+    <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder);
+
+    /**
+     * Attempts to register a datapack registry and notify Nexus API/add it to {@link #getRegistrySetBuilder()}.
+     *
+     * @return The {@link ResourceKey} corresponding to the registered datapack registry.
+     *
+     * @param <T> The object type within the datapack registry (e.g. {@link Item}).
+     * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
+     */
+    <T, R extends Registry<T>> ResourceKey<R> registerDatapackRegistry();
 
     /**
      * Gets the current singleton {@link RegistrySetBuilder} responsible for populating datapack entries from registration

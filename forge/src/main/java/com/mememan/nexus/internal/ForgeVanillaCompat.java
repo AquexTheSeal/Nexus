@@ -24,6 +24,7 @@ public final class ForgeVanillaCompat {
      * Property Wrappers.
      *
      * @apiNote Tool actions (stripping, tilling, flattening) and fuel are handled separately in their corresponding events.
+     *
      * @see NexusForgeCommonMiscEvents
      */
     public static void registerVanillaIntegration() {

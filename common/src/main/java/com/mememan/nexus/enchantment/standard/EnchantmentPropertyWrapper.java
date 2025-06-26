@@ -1,14 +1,23 @@
 package com.mememan.nexus.enchantment.standard;
 
 import com.google.common.collect.ImmutableMap;
-import com.mememan.nexus.item.standard.ItemPropertyWrapper;
+import com.mememan.nexus.datagen.ProviderType;
+import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.platform.NexusServices;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -104,7 +113,7 @@ public class EnchantmentPropertyWrapper {
      * @param parentTemplateWrapper The parent {@link EnchantmentPropertyWrapper} template from which {@link #builder()}
      *                              data should be copied.
      *
-     * @return A new {@link ItemPropertyWrapper} instance, set as a template, inheriting from the provided EPW template.
+     * @return A new {@link EnchantmentPropertyWrapper} instance, set as a template, inheriting from the provided EPW template.
      * If the provided EPW template is {@code null}, returns {@link #createTemplate()}.
      *
      * @see #createTemplate()
@@ -205,6 +214,14 @@ public class EnchantmentPropertyWrapper {
     public static EnchantmentPropertyWrapper copyProperties(EnchantmentPropertyWrapper from, EnchantmentPropertyWrapper to) {
         if (from.builder == null) return to;
         return to.builder()
+                .excludeFromNativeDatagen(from.builder.excludeFromNativeDatagen)
+                .literalTranslation(from.builder.literalTranslation)
+                .withCustomSeparatorWords(List.copyOf(from.builder.definedSeparatorWords))
+                .withCustomName(from.builder.manuallyLocalizedEnchantmentName)
+                .withLocalization(from.builder.enchantmentTranslationFunc)
+                .bypassDefaultTranslation(from.builder.bypassDefaultTranslation)
+                .withSetTags(List.copyOf(from.builder.parentTags))
+                .requiresSetDatagenEntries(Map.copyOf(from.builder.mappedProviderRequisites))
                 .build(); // Direct setting of the builder would copy the entire object itself, which would in-turn overwrite it if any calls are made to the copied EPW afterward
     }
 
@@ -249,6 +266,89 @@ public class EnchantmentPropertyWrapper {
     }
 
     /**
+     * Gets the manually localized enchantment name from the {@link #builder()} if the builder exists.
+     *
+     * @return The manually localized enchantment name, or an empty {@code String} if the {@link #builder()} is {@code null}.
+     */
+    public String getManuallyLocalizedEnchantmentName() {
+        return builder == null ? "" : builder.manuallyLocalizedEnchantmentName;
+    }
+
+    /**
+     * Gets whether this EPW instance bypasses default translation corrections.
+     *
+     * @return Whether this EPW instance bypasses default translation corrections.
+     */
+    public boolean hasLiteralTranslation() {
+        return builder != null && builder.literalTranslation;
+    }
+
+    /**
+     * Gets whether this EPW instance bypasses default translation altogether.
+     *
+     * @return Whether this EPW instance bypasses default translation altogether.
+     */
+    public boolean bypassDefaultTranslation() {
+        return builder != null && builder.bypassDefaultTranslation;
+    }
+
+    /**
+     * Gets the defined separator words from the {@link #builder()} if the builder exists.
+     *
+     * @return The defined separator words, or an empty {@link ObjectArrayList} if the {@link #builder()} is
+     * {@code null}.
+     */
+    public List<String> getDefinedSeparatorWords() {
+        return builder == null ? ObjectArrayList.of() : builder.definedSeparatorWords;
+    }
+
+    /**
+     * Gets the localization {@code Function<String, String>} from the {@link #builder()} if the builder exists, and it
+     * is defined within said builder. May be {@code null}.
+     *
+     * @return The {@code Function<String, String>}, or {@code null} if the {@link #builder()} is {@code null} || it
+     * isn't defined within said builder.
+     */
+    @Nullable
+    public Function<String, String> getEnchantmentTranslationFunc() {
+        return builder == null ? null : builder.enchantmentTranslationFunc;
+    }
+
+    /**
+     * Gets the defined parent {@linkplain Supplier<TagKey< Enchantment >> Tags} from the {@link #builder()} if the builder 
+     * exists.
+     *
+     * @return The defined parent {@linkplain Supplier<TagKey<Enchantment>> Tags}, or an empty {@link ObjectArrayList} if 
+     * the {@link #builder()} is {@code null}.
+     */
+    public List<Supplier<TagKey<Enchantment>>> getParentEnchantmentTags() {
+        return builder == null ? ObjectArrayList.of() : builder.parentTags;
+    }
+
+    /**
+     * Whether data present in {@link #builder()} (if not {@code null}) should automatically be handled/generated by
+     * Nexus API.
+     *
+     * @return {@code true} if {@link #builder} isn't {@code null} and {@link EPWBuilder#excludeFromNativeDatagen} is set
+     * to {@code true}, {@code false} otherwise.
+     */
+    public boolean excludeFromNativeDatagen() {
+        return builder != null && builder.excludeFromNativeDatagen;
+    }
+
+    /**
+     * Gets a {@link Map} (usually {@link Object2BooleanOpenHashMap}) specifying the {@linkplain ProviderType ProviderTypes}
+     * for which this EPW instance requires data to present for generation. May be empty if {@link #builder} is {@code null}
+     * or the underlying {@link Map} is also empty.
+     *
+     * @return The {@link Map} representing different {@linkplain ProviderType ProviderTypes} and their requirements for
+     * datagen. May be empty.
+     */
+    public Map<ProviderType, Boolean> getProviderTypeRequisites() {
+        return builder == null ? new Object2BooleanOpenHashMap<>() : builder.mappedProviderRequisites;
+    }
+
+    /**
      * Whether this EPW instance is a template. Templates are not stored in {@link #getMappedEpws()} and have no parent
      * {@link Enchantment}.
      *
@@ -277,10 +377,326 @@ public class EnchantmentPropertyWrapper {
     public static class EPWBuilder {
         private final EnchantmentPropertyWrapper ownerWrapper;
         private final Supplier<Enchantment> enchantmentParent;
+        private String manuallyLocalizedEnchantmentName = "";
+        private List<String> definedSeparatorWords = ObjectArrayList.of();
+        private final List<Supplier<TagKey<Enchantment>>> parentTags = ObjectArrayList.of();
+        @Nullable
+        private Function<String, String> enchantmentTranslationFunc;
+        private boolean literalTranslation = false;
+        private boolean bypassDefaultTranslation = false;
+        private boolean excludeFromNativeDatagen = false;
+        private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
+        private final Map<Component, String> enchantmentTooltips = new Object2ObjectOpenHashMap<>();
 
         public EPWBuilder(EnchantmentPropertyWrapper ownerWrapper, Supplier<Enchantment> enchantmentParent) {
             this.ownerWrapper = ownerWrapper;
             this.enchantmentParent = enchantmentParent;
+        }
+
+        /**
+         * Assigns a custom translation key for datagen. By default, a basic regex algorithm is used to automatically localize
+         * the block name into something more legible (I.E. The names you see in-game). This property is simply an override
+         * mechanic which aims to give the end-developer more control over the resulting name instead of being forced to rely on
+         * the aforementioned algorithm.
+         * <br></br>
+         * The algorithm in question, in a nutshell, works as follows (the code block below is purely demonstrative of the
+         * localization process and has nothing to do with how the algorithm is actually written):
+         * <pre>
+         *     {@code
+         *      public class AlgorithmExampleDescriptor {
+         *
+         *          public static void main(String[] args) {
+         *              // Input
+         *              String unlocalizedName = "enchantment.mymodid.my_enchantment"; // The registry name/initial unlocalized name
+         *
+         *              // Steps
+         *              AlgorithmLanguageProvider.validateNullity(unlocalizedName); // Checks whether the provided 'unlocalizedName' is empty/all whitespaces/you get the point
+         *              AlgorithmLanguageProvider.validateRegex(unlocalizedName); // Checks whether the provided 'unlocalizedName' has the signature registry name separator character "."
+         *              AlgorithmLanguageProvider.formatCaps(unlocalizedName); // Output: "Enchantment.Mymodid.My_Enchantment" <-- Capitalizes the first letter of each word based on regex-checks for special separators ("." and "_") (First character all the way to the left is always capitalized (duh), not that it matters)
+         *              AlgorithmLanguageProvider.formatSeparators(unlocalizedName); // Output: "Enchantment.Mymodid.My_Enchantment" <-- Any defined "separator" Strings are lowercased, see #withCustomSeparatorWords(List)
+         *              AlgorithmLanguageProvider.formatSpecialSeparators(unlocalizedName); // Output: "My Enchantment" <-- All characters preceding the last "." are substringed/removed, and then any "_" characters are replaced with whitespaces
+         *
+         *              // End result
+         *              System.out.println(unlocalizedName); // Output: "My Enchantment"
+         *          }
+         *      }
+         *     }
+         * </pre>
+         *
+         * @param manuallyLocalizedEnchantmentName The name override used to localize the parent
+         * {@linkplain Enchantment Enchantment's} registry name.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #withCustomSeparatorWords(List)
+         * @see #withLocalization(Function)
+         * @see #literalTranslation(boolean)
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public EPWBuilder withCustomName(String manuallyLocalizedEnchantmentName) {
+            this.manuallyLocalizedEnchantmentName = manuallyLocalizedEnchantmentName;
+            return this;
+        }
+
+        /**
+         * Marks this builder as using literal translations, meaning that corrections (like the one seen in the example
+         * provided by {@link #withCustomName(String)}) are not applied.
+         *
+         * @param literalTranslation Whether to use literal translations.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #withCustomName(String)
+         * @see #withLocalization(Function)
+         * @see #literalTranslation()
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public EPWBuilder literalTranslation(boolean literalTranslation) {
+            this.literalTranslation = literalTranslation;
+            return this;
+        }
+
+        /**
+         * A custom {@link Function} to apply miscellaneous modifications to the resulting localized block name. This is
+         * influenced by {@link #withCustomName(String)} and {@link #literalTranslation(boolean)}, where applicable.
+         *
+         * @param enchantmentTranslationFunc The {@link Function} responsible for directly modifying the resulting
+         *                                   localized enchantment name.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #withCustomName(String)
+         * @see #literalTranslation(boolean)
+         */
+        public EPWBuilder withLocalization(Function<String, String> enchantmentTranslationFunc) {
+            this.enchantmentTranslationFunc = enchantmentTranslationFunc;
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #literalTranslation(boolean)} which marks this builder as using literal translations.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #literalTranslation(boolean)
+         */
+        public EPWBuilder literalTranslation() {
+            return literalTranslation(true);
+        }
+
+        /**
+         * Whether this EPWBuilder instance should skip the translation process altogether.
+         * <br></br>
+         * Note that data won't be generated for this instance (NPEs may be thrown too, based on the validation policy
+         * for your mod) unless {@link #literalTranslation(boolean)} is marked as {@code true} or {@link #withCustomName(String)}
+         * is set to a non-{@code null} value.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation()
+         */
+        public EPWBuilder bypassDefaultTranslation(boolean bypassDefaultTranslation) {
+            this.bypassDefaultTranslation = bypassDefaultTranslation;
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #bypassDefaultTranslation(boolean)}, marking this builder to be skipped by the
+         * default localization algorithm Nexus API employs. See the base variant for more info.
+         *
+         * @return {@link #bypassDefaultTranslation(boolean)}
+         *
+         * @see #literalTranslation(boolean)
+         * @see #withCustomName(String)
+         * @see #bypassDefaultTranslation(boolean)
+         */
+        public EPWBuilder bypassDefaultTranslation() {
+            return bypassDefaultTranslation(true);
+        }
+
+        /**
+         * Assigns a {@link List} of custom separator words which are lowercased during the algorithm's de-localization
+         * process. This is ignored if {@link #manuallyLocalizedEnchantmentName} is defined, {@link #literalTranslation}
+         * is {@code true}, or if {@link #enchantmentTranslationFunc} is non-null.
+         *
+         * @param definedSeparatorWords The {@link List} of custom separator words to lowercase while the algorithm is
+         *                              running.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @apiNote The default entries for this are {"Of", "And"}. This {@link List} is appended to the default
+         * separator definitions rather than replacing them.
+         *
+         * @see #withCustomName(String)
+         * @see #withLocalization(Function)
+         * @see #literalTranslation(boolean)
+         */
+        public EPWBuilder withCustomSeparatorWords(List<String> definedSeparatorWords) {
+            this.definedSeparatorWords = definedSeparatorWords;
+            return this;
+        }
+
+        /**
+         * Tags this EPWBuilder's parent {@link Enchantment} with the provided {@link TagKey<Enchantment>}.
+         *
+         * @param parentEnchantmentTag The {@code TagKey<Enchantment>} with which this IPW's parent {@link Enchantment}
+         *                             will be tagged. May only be of type {@link Enchantment}.
+         *
+         * @return {@code this} (builder method).
+         */
+        public EPWBuilder withTag(Supplier<TagKey<Enchantment>> parentEnchantmentTag) {
+            this.parentTags.add(parentEnchantmentTag);
+            return this;
+        }
+
+        /**
+         * Tags this EPWBuilder's parent {@link Enchantment} with the provided {@linkplain TagKey<Enchantment> Tags}.
+         * Appends to the existing list.
+         *
+         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this IPW's parent {@link Enchantment}
+         *                              will be tagged. May only be of type {@link Enchantment}.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #withSetTags(List)
+         */
+        public EPWBuilder withTags(List<Supplier<TagKey<Enchantment>>> parentEnchantmentTags) {
+            this.parentTags.addAll(parentEnchantmentTags);
+            return this;
+        }
+
+        /**
+         * Tags this EPWBuilder's parent Enchantment with the provided {@linkplain TagKey<Enchantment> Tags}. Overwrites
+         * the existing {@link List}.
+         *
+         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this IPW's parent
+         *                              {@link Enchantment} will be tagged. May only be of type {@link Enchantment}.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #withTags(List)
+         */
+        public EPWBuilder withSetTags(List<Supplier<TagKey<Enchantment>>> parentEnchantmentTags) {
+            this.parentTags.clear();
+            this.parentTags.addAll(parentEnchantmentTags);
+            return this;
+        }
+
+        /**
+         * Determines whether this EPWBuilder instance should be entirely excluded from Nexus' native datagen.
+         * <br></br>
+         * Fundamentally, all this does is flag this instance as not needing a data entry to be mapped to it. You may
+         * choose to generate data for it yourself if needed, since Nexus won't handle datagen for this particular object.
+         * <br></br>
+         * If a block-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
+         * instance (and its children, so long as this value isn't modified) will still be excluded from datagen, and thus
+         * an exception won't be thrown for it.
+         *
+         * @param excludeFromNativeDatagen Whether this instance's data should be passed into Nexus' native datagen for
+         *                                 data generation.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #excludeFromNativeDatagen()
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         */
+        public EPWBuilder excludeFromNativeDatagen(boolean excludeFromNativeDatagen) {
+            this.excludeFromNativeDatagen = excludeFromNativeDatagen;
+            return this;
+        }
+
+        /**
+         * Determines whether this EPWBuilder instance is required to generate necessary block-related data based on the
+         * {@link ProviderType} passed in.
+         * <br></br>
+         * By default, unmapped providers will not require an entry for this EPWBuilder to be generated unless
+         * {@link ModDataProvider#validateAllEntries()} is set to {@code true}.
+         * <br></br>
+         * Mapping the related provider passed in here to {@code requiresDatagenEntry}, set to {@code true}, will flag
+         * this EPWBuilder instance for requiring related data regardless of what
+         * {@link ModDataProvider#validateAllEntries()} is set to.
+         *
+         * @param targetProviderType The {@link ProviderType} to modify the data entry requirement for.
+         * @param requiresDatagenEntry Whether this EPWBuilder should require data related to the specified
+         *                             {@code targetProviderType} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public EPWBuilder requiresDatagenEntry(ProviderType targetProviderType, boolean requiresDatagenEntry) {
+            mappedProviderRequisites.put(targetProviderType, requiresDatagenEntry);
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}.
+         *
+         * @param targetProviderTypes The {@link List} of {@linkplain ProviderType ProviderTypes} to modify the data
+         *                            entry requirements for.
+         * @param requiresDatagenEntry Whether this EPWBuilder should require data related to each of the
+         *                             specified {@code targetProviderTypes} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public EPWBuilder requiresDatagenEntries(List<ProviderType> targetProviderTypes, boolean requiresDatagenEntry) {
+            targetProviderTypes.forEach(type -> requiresDatagenEntry(type, requiresDatagenEntry));
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}. Overrides the existing
+         * {@link Map}.
+         *
+         * @param targetProviderTypes The {@link List} of {@linkplain ProviderType ProviderTypes} to modify the data
+         *                            entry requirements for.
+         * @param requiresDatagenEntry Whether this EPWBuilder should require data related to each of the
+         *                             specified {@code targetProviderTypes} to be present.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(Map)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public EPWBuilder requiresSetDatagenEntries(List<ProviderType> targetProviderTypes, boolean requiresDatagenEntry) {
+            mappedProviderRequisites.clear();
+            targetProviderTypes.forEach(type -> requiresDatagenEntry(type, requiresDatagenEntry));
+            return this;
+        }
+
+        /**
+         * Overloaded variant of {@link #requiresDatagenEntry(ProviderType, boolean)}. Maps each of the
+         * {@linkplain ProviderType ProviderTypes} passed in to {@code requiresDatagenEntry}. Overrides the existing
+         * {@link Map}.
+         *
+         * @param mappedProviderRequisites The {@link Map} of provider requisites to override the existing {@link Map}
+         *                                 with.
+         *
+         * @return {@code this} (builder method).
+         *
+         * @see #requiresDatagenEntry(ProviderType, boolean)
+         * @see #requiresDatagenEntries(List, boolean)
+         * @see #requiresSetDatagenEntries(List, boolean)
+         * @see #excludeFromNativeDatagen(boolean)
+         */
+        public EPWBuilder requiresSetDatagenEntries(Map<ProviderType, Boolean> mappedProviderRequisites) {
+            this.mappedProviderRequisites.clear();
+            this.mappedProviderRequisites.putAll(mappedProviderRequisites);
+            return this;
         }
 
         /**
