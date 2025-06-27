@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.asm.ClassFinder;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
+import com.mememan.nexus.loader.StandardRegistryBuilder;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.Registrar;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
@@ -83,6 +84,11 @@ public class FabricRegistrar implements Registrar {
         }
 
         return () -> targetObject;
+    }
+
+    @Override
+    public <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder) {
+        return null;
     }
 
     @Override

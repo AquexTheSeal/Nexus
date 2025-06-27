@@ -181,16 +181,6 @@ public interface Registrar {
     <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder);
 
     /**
-     * Attempts to register a datapack registry and notify Nexus API/add it to {@link #getRegistrySetBuilder()}.
-     *
-     * @return The {@link ResourceKey} corresponding to the registered datapack registry.
-     *
-     * @param <T> The object type within the datapack registry (e.g. {@link Item}).
-     * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
-     */
-    <T, R extends Registry<T>> ResourceKey<R> registerDatapackRegistry();
-
-    /**
      * Gets the current singleton {@link RegistrySetBuilder} responsible for populating datapack entries from registration
      * code. May be {@code null} if accessed too early (i.e. before the first datapack registrar {@code class} is hit).
      *
