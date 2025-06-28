@@ -8,15 +8,24 @@ import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import com.mememan.nexus.loader.StandardRegistryBuilder;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.Registrar;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.RegistrySynchronization;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -87,13 +96,42 @@ public class FabricRegistrar implements Registrar {
     }
 
     @Override
-    public <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder) {
-        return null;
+    public <T> Registry<T> registerStandardRegistry(StandardRegistryBuilder<T, Registry<T>> registryBuilder) {
+        Registry<T> builtReg = registryBuilder.buildAndGetRegistry();
+
+        if (!(builtReg instanceof WritableRegistry<T>)) throw new IllegalArgumentException("Registry " + registryBuilder.getRegistryKey() + " is not of type WritableRegistry. FabricRegistryBuilder requires registries to implement WritableRegistry. Nexus may update around this generic type constraint at a later point, but for now, ensure your custom registry type implements WritableRegistry.");
+
+        FabricRegistryBuilder<T, ? extends WritableRegistry<T>> fabricRegBuilder = FabricRegistryBuilder.from((WritableRegistry<T>) builtReg);
+
+        if (registryBuilder.isSynced()) fabricRegBuilder = fabricRegBuilder.attribute(RegistryAttribute.SYNCED);
+        if (registryBuilder.isPersistent()) fabricRegBuilder = fabricRegBuilder.attribute(RegistryAttribute.PERSISTED);
+
+        builtReg = fabricRegBuilder.buildAndRegister();
+
+        return builtReg;
+    }
+
+    @Override
+    public <T> ResourceKey<Registry<T>> registerDatapackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> registryCodec, @Nullable Codec<T> networkCodec) {
+        if (networkCodec != null) DynamicRegistries.registerSynced(registryKey, registryCodec, networkCodec);
+        else DynamicRegistries.register(registryKey, registryCodec);
+
+        return registryKey;
     }
 
     @Override
     public @Nullable RegistrySetBuilder getRegistrySetBuilder() {
         return getDatapackRegistrySetBuilder();
+    }
+
+    @Override
+    public List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries() {
+        return DynamicRegistries.getDynamicRegistries();
+    }
+
+    @Override
+    public Map<ResourceKey<? extends Registry<?>>, RegistrySynchronization.NetworkedRegistryData<?>> getSyncedDynamicRegistries() {
+        return Map.copyOf(RegistrySynchronization.NETWORKABLE_REGISTRIES);
     }
 
     protected <T> Supplier<T> tCastObjSupMappingFunc(Function<? extends BootstapContext<?>, ? extends Supplier<?>> objSupMappingFunc, BootstapContext<T> bootstapContext) { // I love wildcard casts

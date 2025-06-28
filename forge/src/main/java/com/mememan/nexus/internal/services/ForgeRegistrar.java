@@ -7,23 +7,28 @@ import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.asm.ClassFinder;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import com.mememan.nexus.loader.StandardRegistryBuilder;
+import com.mememan.nexus.mixins.forge.DataPackRegistriesHooksAccessor;
 import com.mememan.nexus.platform.NexusServices;
 import com.mememan.nexus.platform.services.Registrar;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectObjectMutablePair;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -105,13 +110,45 @@ public class ForgeRegistrar implements Registrar {
     }
 
     @Override
-    public <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder) {
-        return null;
+    public <T> Registry<T> registerStandardRegistry(StandardRegistryBuilder<T, Registry<T>> registryBuilder) {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus(); // Should not be null at the time this method is called
+        DeferredRegister<T> defReg = DeferredRegister.create(registryBuilder.getRegistryKey(), registryBuilder.getRegistryKey().location().getNamespace());
+        RegistryBuilder<T> forgeRegBuilder = new RegistryBuilder<>();
+
+        if (!registryBuilder.isSynced()) forgeRegBuilder.disableSync();
+        if (!registryBuilder.isPersistent()) forgeRegBuilder.disableSaving();
+        if (!registryBuilder.isBuiltAsCustomRegistry() && registryBuilder.getDefaultRegistryEntryLocation() != null) forgeRegBuilder.setDefaultKey(registryBuilder.getDefaultRegistryEntryLocation()); // Consistent behaviour across loaders. We can probably implement this some other way later.
+
+        forgeRegBuilder.hasTags(); // No reason not to default to adding the registry to Minecraft's root registry
+
+        defReg.makeRegistry(() -> forgeRegBuilder);
+        defReg.register(modBus);
+
+        return registryBuilder.buildAndGetRegistry();
+    }
+
+    @Override
+    public <T> ResourceKey<Registry<T>> registerDatapackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> registryCodec, @Nullable Codec<T> networkCodec) {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus(); // Should not be null at the time this method is called
+
+        modBus.addListener((DataPackRegistryEvent.NewRegistry event) -> event.dataPackRegistry(registryKey, registryCodec, networkCodec));
+
+        return registryKey;
     }
 
     @Override
     public @Nullable RegistrySetBuilder getRegistrySetBuilder() {
         return getDatapackRegistrySetBuilder();
+    }
+
+    @Override
+    public List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries() {
+        return DataPackRegistriesHooks.getDataPackRegistries();
+    }
+
+    @Override
+    public Map<ResourceKey<? extends Registry<?>>, RegistrySynchronization.NetworkedRegistryData<?>> getSyncedDynamicRegistries() {
+        return DataPackRegistriesHooksAccessor.getNetworkableRegistries();
     }
 
     protected <T> Supplier<T> tCastObjSupMappingFunc(Function<? extends BootstapContext<?>, ? extends Supplier<?>> objSupMappingFunc, BootstapContext<T> bootstapContext) { // I love wildcard casts

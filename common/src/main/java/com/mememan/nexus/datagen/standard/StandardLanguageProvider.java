@@ -6,8 +6,10 @@ import com.mememan.nexus.block.standard.BlockPropertyWrapper;
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.datagen.ProviderType;
+import com.mememan.nexus.enchantment.standard.EnchantmentPropertyWrapper;
 import com.mememan.nexus.entity.standard.EntityTypePropertyWrapper;
 import com.mememan.nexus.item.standard.ItemPropertyWrapper;
+import com.mememan.nexus.mob_effect.standard.MobEffectPropertyWrapper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -36,6 +38,8 @@ public class StandardLanguageProvider implements ModDataProvider {
     protected final Object2ObjectOpenHashMap<Supplier<Block>, BlockPropertyWrapper> mappedModBPWs;
     protected final Object2ObjectOpenHashMap<Supplier<Item>, ItemPropertyWrapper> mappedModIPWs;
     protected final Object2ObjectOpenHashMap<Supplier<? extends EntityType<?>>, EntityTypePropertyWrapper<?>> mappedModETPWs;
+    protected final Object2ObjectOpenHashMap<Supplier<Enchantment>, EnchantmentPropertyWrapper> mappedModEPWs;
+    protected final Object2ObjectOpenHashMap<Supplier<MobEffect>, MobEffectPropertyWrapper> mappedModMEPWs;
 
     public StandardLanguageProvider(PackOutput output, String modId, String locale, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
         this.output = output;
@@ -46,6 +50,7 @@ public class StandardLanguageProvider implements ModDataProvider {
 
         this.outputPath = output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(modId).resolve("lang").resolve(locale + ".json");
 
+        //TODO Probably refactor this sometime down the road
         this.mappedModBPWs = BlockPropertyWrapper.getMappedBpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.BLOCK.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
@@ -83,11 +88,26 @@ public class StandardLanguageProvider implements ModDataProvider {
 
                     if (validateAllEntries() || curETPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
                         if (curETPW.bypassDefaultTranslation() && (curETPW.getManuallyLocalizedEntityTypeName() == null || curETPW.getManuallyLocalizedEntityTypeName().isEmpty())) {
-                            throw new NullPointerException(String.format("Missing %s locale entry for entity type %s, required by mod: %s, either because validateAllEntries is set to true or the item itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites() (EntityTypePropertyWrapper#bypassDefaultTranslation() is set to true, but EntityTypePropertyWrapper#getManuallyLocalizedEntityTypeName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curETPW.getManuallyLocalizedEntityTypeName() == null ? "null" : "empty"));
+                            throw new NullPointerException(String.format("Missing %s locale entry for entity type %s, required by mod: %s, either because validateAllEntries is set to true or the entity type itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites() (EntityTypePropertyWrapper#bypassDefaultTranslation() is set to true, but EntityTypePropertyWrapper#getManuallyLocalizedEntityTypeName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curETPW.getManuallyLocalizedEntityTypeName() == null ? "null" : "empty"));
                         }
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
+        this.mappedModEPWs = EnchantmentPropertyWrapper.getMappedEpws().entrySet()
+                .stream()
+                .filter(curEntry -> BuiltInRegistries.ENCHANTMENT.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
+                .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
+                .peek(curEntry -> {
+                    EnchantmentPropertyWrapper curEPW = curEntry.getValue();
+
+                    if (validateAllEntries() || curEPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                        if (curEPW.bypassDefaultTranslation() && (curEPW.getManuallyLocalizedEnchantmentName() == null || curEPW.getManuallyLocalizedEnchantmentName().isEmpty())) {
+                            throw new NullPointerException(String.format("Missing %s locale entry for enchantment %s, required by mod: %s, either because validateAllEntries is set to true or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites() (EnchantmentPropertyWrapper#bypassDefaultTranslation() is set to true, but EnchantmentPropertyWrapper#getManuallyLocalizedEntityTypeName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curEPW.getManuallyLocalizedEnchantmentName() == null ? "null" : "empty"));
+                        }
+                    }
+                })
+                .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
+
     }
 
     protected void addTranslations() {

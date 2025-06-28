@@ -39,15 +39,17 @@ public class StandardRegistryBuilder<T, R extends Registry<T>> {
      * {@link ResourceKey#createRegistryKey(ResourceLocation)}.
      *
      * @param registryKey The registry's {@linkplain ResourceKey identifier key}.
+     * @param regTypeClazz Dummy placeholder for the object type within the registry (e.g. {@link Item}) to bypass
+     *                     Java's generic type invariance.
      *
      * @return A new {@code StandardRegistryBuilder}, ready for configuration.
      *
      * @param <T> The object type within the {@link Registry} (e.g. {@link Item}).
      * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
      *
-     * @see #of(ResourceLocation)
+     * @see #of(ResourceLocation, Class)
      */
-    public static <T, R extends Registry<T>> StandardRegistryBuilder<T, R> of(ResourceKey<R> registryKey) {
+    public static <T, R extends Registry<T>> StandardRegistryBuilder<T, R> of(ResourceKey<R> registryKey, Class<T> regTypeClazz) {
         return new StandardRegistryBuilder<>(registryKey);
     }
 
@@ -57,15 +59,17 @@ public class StandardRegistryBuilder<T, R extends Registry<T>> {
      * {@link ResourceKey#createRegistryKey(ResourceLocation)}.
      *
      * @param registryId The registry's {@linkplain ResourceLocation identifier}.
+     * @param regTypeClazz Dummy placeholder for the object type within the registry (e.g. {@link Item}) to bypass
+     *                     Java's generic type invariance.
      *
      * @return A new {@code StandardRegistryBuilder}, ready for configuration.
      *
      * @param <T> The object type within the {@link Registry} (e.g. {@link Item}).
      * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
      *
-     * @see #of(ResourceKey)
+     * @see #of(ResourceKey, Class)
      */
-    public static <T, R extends Registry<T>> StandardRegistryBuilder<T, R> of(ResourceLocation registryId) {
+    public static <T, R extends Registry<T>> StandardRegistryBuilder<T, R> of(ResourceLocation registryId, Class<T> regTypeClazz) {
         return new StandardRegistryBuilder<>((ResourceKey<R>) ResourceKey.createRegistryKey(registryId));
     }
 
@@ -173,6 +177,16 @@ public class StandardRegistryBuilder<T, R extends Registry<T>> {
      */
     public ResourceKey<R> getRegistryKey() {
         return registryKey;
+    }
+
+    /**
+     * Gets the default entry for the wrapped registry.
+     *
+     * @return The default entry for the wrapped registry. May be {@code null}.
+     */
+    @Nullable
+    public ResourceLocation getDefaultRegistryEntryLocation() {
+        return defaultRegistryEntryLocation;
     }
 
     /**

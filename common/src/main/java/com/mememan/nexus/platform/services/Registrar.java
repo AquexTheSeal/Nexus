@@ -3,12 +3,15 @@ package com.mememan.nexus.platform.services;
 import com.mememan.nexus.Nexus;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import com.mememan.nexus.loader.StandardRegistryBuilder;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -17,6 +20,8 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -176,9 +181,55 @@ public interface Registrar {
      * @return The newly-registered {@link Registry}.
      *
      * @param <T> The object type within the {@link Registry} (e.g. {@link Item}).
-     * @param <R> The {@linkplain Registry Registry's} generic type itself (e.g. {@code Registry<Item>}).
      */
-    <T, R extends Registry<T>> R registerStandardRegistry(StandardRegistryBuilder<T, R> registryBuilder);
+    <T> Registry<T> registerStandardRegistry(StandardRegistryBuilder<T, Registry<T>> registryBuilder);
+
+    /**
+     * Attempts to register a custom datapack registry and notify Nexus API to add its contents to
+     * {@link #getRegistrySetBuilder()}.
+     *
+     * @param registryKey The registry's {@linkplain ResourceKey identifier key}.
+     * @param registryCodec The {@link Codec} used to de/serialize objects from/to JSON files.
+     * @param networkCodec The {@link Codec} used to sync this registry's objects to the client. This is usually the
+     *                     same as {@code registryCodec}, if needed.
+     *
+     * @return The {@link ResourceKey} corresponding to the newly-registered datapack registry.
+     *
+     * @param <T> The object type within the registry (e.g. {@link Item}).
+     */
+    <T> ResourceKey<Registry<T>> registerDatapackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> registryCodec, @Nullable Codec<T> networkCodec);
+
+    /**
+     * Overloaded variant of {@link #registerDatapackRegistry(ResourceKey, Codec, Codec)} that defaults the network
+     * codec to {@code null}, such that the datapack registry being registered is only required on the server and isn't
+     * synced to the client.
+     *
+     * @param registryKey The registry's {@linkplain ResourceKey identifier key}.
+     * @param registryCodec The {@link Codec} used to de/serialize objects from/to JSON files.
+     *
+     * @return The {@link ResourceKey} corresponding to the newly-registered datapack registry.
+     *
+     * @param <T> The object type within the registry (e.g. {@link Item}).
+     */
+    default <T> ResourceKey<Registry<T>> registerServerDatapackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> registryCodec) {
+        return registerDatapackRegistry(registryKey, registryCodec, null);
+    }
+
+    /**
+     * Overloaded variant of {@link #registerDatapackRegistry(ResourceKey, Codec, Codec)} that defaults the network
+     * codec to {@code registryCodec}, such that the datapack registry being registered is synced to the client using
+     * the same codec.
+     *
+     * @param registryKey The registry's {@linkplain ResourceKey identifier key}.
+     * @param registryCodec The {@link Codec} used to de/serialize objects from/to JSON files.
+     *
+     * @return The {@link ResourceKey} corresponding to the newly-registered datapack registry.
+     *
+     * @param <T> The object type within the registry (e.g. {@link Item}).
+     */
+    default <T> ResourceKey<Registry<T>> registerSyncedDatapackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> registryCodec) {
+        return registerDatapackRegistry(registryKey, registryCodec, registryCodec);
+    }
 
     /**
      * Gets the current singleton {@link RegistrySetBuilder} responsible for populating datapack entries from registration
@@ -191,4 +242,33 @@ public interface Registrar {
      */
     @Nullable
     RegistrySetBuilder getRegistrySetBuilder();
+
+    /**
+     * Gets a {@link List} of all registered dynamic registries.
+     * <br></br>
+     * Each loader has its own implementation when it comes to retrieving a collection of all registered dynamic
+     * registries, all of which boiling down to external lists that simply copy Vanilla's {@link RegistryDataLoader}
+     * registry data and append to it.
+     * <br></br>
+     * Hence, Nexus API attempts to group them appropriately, such that even custom registries not registered via Nexus
+     * API can still be retrieved.
+     *
+     * @return A {@link List} of all registered dynamic registries.
+     */
+    List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries();
+
+    /**
+     * Gets a {@link Map} of all registered dynamic registries synced to the client.
+     * <br></br>
+     * Each loader has its own implementation when it comes to retrieving a collection of synced registered dynamic
+     * registries, all of which boiling down to modifying {@link RegistrySynchronization#NETWORKABLE_REGISTRIES} (to
+     * be more specific, Fabric directly copes and sets, while Forge adds a hook and copies into their own custom
+     * {@link Map}).
+     * <br></br>
+     * Hence, Nexus API attempts to group them appropriately, such that even custom registries not registered via Nexus
+     * API can still be retrieved.
+     *
+     * @return A {@link Map} of all registered dynamic registries synced to the client.
+     */
+    Map<ResourceKey<? extends Registry<?>>, RegistrySynchronization.NetworkedRegistryData<?>> getSyncedDynamicRegistries();
 }

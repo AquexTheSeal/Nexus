@@ -103,9 +103,28 @@ accessible field net/minecraft/data/recipes/RecipeProvider advancementPathProvid
 # ModelProvider
 extendable method net/minecraft/data/models/ModelProvider getName ()Ljava/lang/String;
 
+# RegistriesDatapackGenerator
+extendable method net/minecraft/data/registries/RegistriesDatapackGenerator getName ()Ljava/lang/String;
+
 # Enchantment
 transitive-accessible method net/minecraft/world/item/enchantment/Enchantment <init> (Lnet/minecraft/world/item/enchantment/Enchantment$Rarity;Lnet/minecraft/world/item/enchantment/EnchantmentCategory;[Lnet/minecraft/world/entity/EquipmentSlot;)V
 transitive-accessible field net/minecraft/world/item/enchantment/Enchantment slots [Lnet/minecraft/world/entity/EquipmentSlot;
 
 # MobEffect
 transitive-accessible method net/minecraft/world/effect/MobEffect <init> (Lnet/minecraft/world/effect/MobEffectCategory;I)V
+
+# RegistrySetBuilder
+accessible field net/minecraft/core/RegistrySetBuilder entries Ljava/util/List;
+accessible field net/minecraft/data/registries/RegistriesDatapackGenerator output Lnet/minecraft/data/PackOutput;
+accessible field net/minecraft/data/registries/RegistriesDatapackGenerator registries Ljava/util/concurrent/CompletableFuture;
+extendable method net/minecraft/data/registries/RegistriesDatapackGenerator dumpRegistryCap (Lnet/minecraft/data/CachedOutput;Lnet/minecraft/core/HolderLookup$Provider;Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/resources/RegistryDataLoader$RegistryData;)Ljava/util/Optional;
+extendable method net/minecraft/data/registries/RegistriesDatapackGenerator dumpValue (Ljava/nio/file/Path;Lnet/minecraft/data/CachedOutput;Lcom/mojang/serialization/DynamicOps;Lcom/mojang/serialization/Encoder;Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;
+
+# RegistryStub
+accessible class net/minecraft/core/RegistrySetBuilder$RegistryStub
+
+# NetworkedRegistryData
+accessible class net/minecraft/core/RegistrySynchronization$NetworkedRegistryData
+
+# RegistrySynchronization
+accessible field net/minecraft/core/RegistrySynchronization NETWORKABLE_REGISTRIES Ljava/util/Map;

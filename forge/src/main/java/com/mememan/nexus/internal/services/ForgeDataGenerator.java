@@ -3,6 +3,7 @@ package com.mememan.nexus.internal.services;
 import com.mememan.nexus.asm.annotations.DatagenRegistrarEntry;
 import com.mememan.nexus.datagen.*;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
+import com.mememan.nexus.datagen.standard.StandardDatapackRegistryProvider;
 import com.mememan.nexus.datagen.standard.StandardLanguageProvider;
 import com.mememan.nexus.datagen.standard.StandardRecipeProvider;
 import com.mememan.nexus.loader.ModData;
@@ -33,7 +34,7 @@ import java.util.function.BiFunction;
 public class ForgeDataGenerator implements DataGenerator {
     private static boolean HAS_CONSUMED_GENERATORS = false;
     @Nullable
-    private static net.minecraft.data.DataGenerator CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE;
+    private static net.minecraft.data.DataGenerator GLOBAL_DATA_GENERATOR_INSTANCE;
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends Pair<Boolean, ? extends DataProvider>>>> ENQUEUED_PROVIDERS = new ConcurrentLinkedQueue<>();
     private static final Queue<ObjectObjectImmutablePair<String, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, ? extends ModDataProvider>>> ENQUEUED_MOD_PROVIDERS = new ConcurrentLinkedQueue<>();
     private static final ObjectOpenCustomHashSet<ModDatagenConfig> MOD_DATAGEN_CONFIGS = new ObjectOpenCustomHashSet<>(new Hash.Strategy<>() {
@@ -80,14 +81,14 @@ public class ForgeDataGenerator implements DataGenerator {
 
     @Override
     public @Nullable net.minecraft.data.DataGenerator getDataGenerator() {
-        return CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE;
+        return GLOBAL_DATA_GENERATOR_INSTANCE;
     }
 
     public static boolean hasConsumedGenerators() {
         return HAS_CONSUMED_GENERATORS;
     }
 
-    public static void onGatherDataEvent(final GatherDataEvent event) {
+    private static void onGatherDataEvent(final GatherDataEvent event) {
         net.minecraft.data.DataGenerator primaryGen = event.getGenerator();
         PackOutput rootPackOutput = primaryGen.getPackOutput();
         Path formattedOutputPath = rootPackOutput.getOutputFolder();
@@ -97,7 +98,7 @@ public class ForgeDataGenerator implements DataGenerator {
         boolean onServer = event.includeServer();
 
         if (!hasConsumedGenerators()) { // Safeguard against potentially running this more than once for any reason
-            CURRENT_GLOBAL_DATA_GENERATOR_INSTANCE = primaryGen;
+            GLOBAL_DATA_GENERATOR_INSTANCE = primaryGen;
 
             // ModDataProvider types
             if (!ENQUEUED_MOD_PROVIDERS.isEmpty()) {
@@ -138,6 +139,7 @@ public class ForgeDataGenerator implements DataGenerator {
 
                 // Server
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.RECIPE_PROVIDER, DuplicateDataPolicy.CRASH)));
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER) && onServer, new StandardDatapackRegistryProvider(modSpecificPackOutput, regLookupProvider, NexusServices.REGISTRAR.getRegistrySetBuilder(), modId, providersToValidate.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER, DuplicateDataPolicy.CRASH)));
             });
 
             HAS_CONSUMED_GENERATORS = true;

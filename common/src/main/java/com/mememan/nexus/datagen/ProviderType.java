@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ProviderType {
 
     /**
-     * The {@link ModSide} this type runs on. {@link ModSide#COMMON} is treated exactly like {@link ModSide#SERVER}.
+     * The {@link ModSide} this type runs on. {@link ModSide#COMMON} is run on both sides.
      *
      * @return The {@link ModSide} this provider type runs on.
      */

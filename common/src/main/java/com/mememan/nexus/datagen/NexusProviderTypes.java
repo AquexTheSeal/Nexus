@@ -6,6 +6,7 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,10 @@ public enum NexusProviderTypes implements ProviderType {
      * Represents the {@link IntrinsicHolderTagsProvider} responsible for generating block tags.
      */
     BLOCK_TAGS_PROVIDER(ModSide.SERVER),
+    /**
+     * Represents the {@link RegistriesDatapackGenerator} responsible for generating all datapack registry files.
+     */
+    DYNAMIC_REGISTRY_PROVIDER(ModSide.SERVER),
     /**
      * Represents the sub-{@link LootTableProvider} responsible for generating entity type loot tables.
      */
