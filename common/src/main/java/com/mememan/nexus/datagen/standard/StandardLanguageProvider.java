@@ -39,7 +39,7 @@ public class StandardLanguageProvider implements ModDataProvider {
     protected final Object2ObjectOpenHashMap<Supplier<Item>, ItemPropertyWrapper> mappedModIPWs;
     protected final Object2ObjectOpenHashMap<Supplier<? extends EntityType<?>>, EntityTypePropertyWrapper<?>> mappedModETPWs;
     protected final Object2ObjectOpenHashMap<Supplier<Enchantment>, EnchantmentPropertyWrapper> mappedModEPWs;
-    protected final Object2ObjectOpenHashMap<Supplier<MobEffect>, MobEffectPropertyWrapper> mappedModMEPWs;
+  //  protected final Object2ObjectOpenHashMap<Supplier<MobEffect>, MobEffectPropertyWrapper> mappedModMEPWs;
 
     public StandardLanguageProvider(PackOutput output, String modId, String locale, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
         this.output = output;

@@ -1,6 +1,7 @@
 package com.mememan.nexus.datagen.standard;
 
 import com.google.gson.JsonElement;
+import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.datagen.ProviderType;
@@ -31,7 +32,7 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
     protected final DuplicateDataPolicy dupeStrat;
 
     public StandardDatapackRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registryLookup, RegistrySetBuilder datapackEntriesBuilder, String modId, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
-        super(output, registryLookup.thenApply(provider -> constructRegistries(provider, datapackEntriesBuilder)));
+        super(output, registryLookup.thenApply(provider -> constructRegistries(provider, datapackEntriesBuilder, dupeStrat)));
 
         this.modId = modId;
         this.validateAllEntries = validateAllEntries;
@@ -74,7 +75,7 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
     }
 
     @Override
-    public boolean validateAllEntries() {
+    public boolean validateAllEntries() { // This isn't used here cuz all registries alongside their entries are already validated. Still kept here JIC.
         return validateAllEntries;
     }
 
@@ -88,11 +89,30 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
         return dupeStrat;
     }
 
-    private static HolderLookup.Provider constructRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder)  { // Forge impl for proper dynamic registry handling (+ not worth reinventing the wheel)
+    private static HolderLookup.Provider constructRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder, DuplicateDataPolicy dupeStrat)  { // Modified Forge impl for proper dynamic registry handling (+ not worth reinventing the wheel)
         HashSet<ResourceKey<? extends Registry<?>>> builderKeys = new HashSet<>(datapackEntriesBuilder.entries.stream().map(RegistrySetBuilder.RegistryStub::key).toList());
 
         NexusServices.REGISTRAR.getDynamicRegistries().stream() // While the names are misleading, these are indeed all the existing datapack registries
-                .filter(data -> !builderKeys.contains(data.key()))
+                .filter(data -> {
+                    if (builderKeys.contains(data.key())) {
+                        switch (dupeStrat) { // Setting this to CRASH is not recommended. Weird ahh dupe registries outta nowhere
+                            case CRASH -> throw new IllegalStateException(String.format("Found duplicate registry %s in mod of ID %s, specified DuplicateDataPolicy is CRASH.", data.key(), data.key().location().getNamespace()));
+                            case EXCLUDE_WARN -> {
+                                NexusConstants.LOGGER.warn("Found duplicate registry {} in mod of ID {}, specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", data.key(), data.key().location().getNamespace());
+                                return false;
+                            }
+                            case EXCLUDE_SILENT, OVERRIDE_SILENT -> {
+                                return false;
+                            }
+                            case OVERRIDE_WARN -> {
+                                NexusConstants.LOGGER.warn("Found duplicate registry {} in mod of ID {}, specified DuplicateDataPolicy is OVERRIDE_WARN, which is not supported since RSBs do their own strict duplicate validation. Skipping...", data.key(), data.key().location().getNamespace());
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                })
                 .forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {})); // Add dummy mappings for unmapped registries
 
         return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original);
