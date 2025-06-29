@@ -139,7 +139,7 @@ public class ForgeDataGenerator implements DataGenerator {
 
                 // Server
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.RECIPE_PROVIDER, DuplicateDataPolicy.CRASH)));
-                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER) && onServer, new StandardDatapackRegistryProvider(modSpecificPackOutput, regLookupProvider, NexusServices.REGISTRAR.getRegistrySetBuilder(), modId, providersToValidate.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER, DuplicateDataPolicy.EXCLUDE_SILENT)));
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER) && onServer, new StandardDatapackRegistryProvider(modSpecificPackOutput, regLookupProvider, NexusServices.REGISTRAR.getRegistrySetBuilder(), modId, providersToValidate.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER, DuplicateDataPolicy.CRASH)));
             });
 
             HAS_CONSUMED_GENERATORS = true;

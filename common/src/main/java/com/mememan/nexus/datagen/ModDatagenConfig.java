@@ -17,7 +17,7 @@ import java.util.Set;
  *                      Nexus datagen (for the specified {@code modId}) and providers added through Nexus API under the
  *                      specified modId are disabled.
  * @param mappedDupeStrats A {@link Map} of {@link DuplicateDataPolicy} to abide by when generating data. See the {@code enum}
- *                  itself for more info. Defaults to {@link DuplicateDataPolicy#CRASH} for most providers.
+ *                  itself for more info. Defaults to {@link DuplicateDataPolicy#CRASH} for all providers.
  * @param providerTypesToFullyValidate A {@link Set} of {@linkplain ProviderType ProviderTypes} for which all entries under
  *                                     the parent mod ID should be validated (i.e. checked for presence).
  * @param disabledProviderTypes A {@link Set} of {@linkplain ProviderType ProviderTypes} to be excluded by Nexus API

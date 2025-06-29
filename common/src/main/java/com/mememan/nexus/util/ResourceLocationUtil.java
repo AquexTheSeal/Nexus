@@ -1,5 +1,6 @@
 package com.mememan.nexus.util;
 
+import com.mememan.nexus.datagen.standard.StandardDatapackRegistryProvider;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -14,6 +15,8 @@ public final class ResourceLocationUtil {
 
     /**
      * Formats a given {@link ResourceLocation} as a path rather than {@code namespace:some/path} if it's not Minecraft.
+     * Only really used in {@link StandardDatapackRegistryProvider} to dump registry entries based on their parent
+     * registries.
      *
      * @param targetLoc The {@link ResourceLocation} to format.
      *
