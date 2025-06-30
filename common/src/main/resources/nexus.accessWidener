@@ -106,6 +106,9 @@ extendable method net/minecraft/data/models/ModelProvider getName ()Ljava/lang/S
 # RegistriesDatapackGenerator
 extendable method net/minecraft/data/registries/RegistriesDatapackGenerator getName ()Ljava/lang/String;
 
+# TagsProvider
+extendable method net/minecraft/data/tags/TagsProvider getName ()Ljava/lang/String;
+
 # Enchantment
 transitive-accessible method net/minecraft/world/item/enchantment/Enchantment <init> (Lnet/minecraft/world/item/enchantment/Enchantment$Rarity;Lnet/minecraft/world/item/enchantment/EnchantmentCategory;[Lnet/minecraft/world/entity/EquipmentSlot;)V
 transitive-accessible field net/minecraft/world/item/enchantment/Enchantment slots [Lnet/minecraft/world/entity/EquipmentSlot;

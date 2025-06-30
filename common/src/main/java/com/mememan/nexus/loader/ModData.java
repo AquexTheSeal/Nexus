@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public interface ModData {
 
     /**
-     * Gets this instance's mod metadata, as commonly defined in each loader's respective MTD files
+     * Gets this instance's mod metadata, as commonly defined in each loader's respective MTD file
      * ({@code fabric.mod.json}, {@code mods.toml}, etc.).
      *
      * @return This instance's mod metadata.

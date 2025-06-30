@@ -27,7 +27,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Standard loader-agnostic mod-specific recipe provider in Nexus API. Instanced based on the provided mod ID.
+ * Standard loader-agnostic mod-specific recipe provider in Nexus API. Instanced based on the provided mod ID. Handles
+ * block and item recipes of all types.
  */
 public class StandardRecipeProvider extends RecipeProvider implements ModDataProvider {
     protected final String modId;
@@ -102,7 +103,7 @@ public class StandardRecipeProvider extends RecipeProvider implements ModDataPro
             };
 
             if (wasAlreadyAdded) {
-                switch (dupeStrat) {
+                switch (getDuplicateDataPolicy()) {
                     case CRASH -> throw new IllegalStateException(String.format("Attempted to generate duplicate recipe %s (from mod of ID %s), specified DuplicateDataPolicy is CRASH.", finishedRecipeId, getModId()));
                     case EXCLUDE_WARN -> NexusConstants.LOGGER.warn("Attempted to generate duplicate recipe {} (from mod of ID {}), specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", finishedRecipeId, getModId());
                     case EXCLUDE_SILENT -> {}

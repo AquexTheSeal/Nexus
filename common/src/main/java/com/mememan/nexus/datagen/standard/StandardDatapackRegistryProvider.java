@@ -65,7 +65,7 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
                         if (validateAllEntries() && holderRef.value() == null) throw new NullPointerException(String.format("Missing registry entry for: %s (from mod of ID: %s)", holderRef.key().location(), getModId()));
 
                         if (serializedElements.get(holderRef.key()) != null) { // Registries themselves already handle duplicates anyway, but you never know
-                            switch (dupeStrat) {
+                            switch (getDuplicateDataPolicy()) {
                                 case CRASH -> throw new IllegalStateException(String.format("Duplicate registry entry for: %s (from mod of ID: %s), specified DuplicateDataPolicy is CRASH.", holderRef.key(), getModId()));
                                 case EXCLUDE_WARN -> {
                                     NexusConstants.LOGGER.warn("Duplicate registry entry for: {} (from mod of ID: {}), specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", holderRef.key(), getModId());
@@ -122,13 +122,13 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
     protected static HolderLookup.Provider constructDummyRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder)  { // Modified Forge impl for proper dynamic registry handling (+ not worth reinventing the wheel)
         HashSet<ResourceKey<? extends Registry<?>>> builderKeys = new HashSet<>(datapackEntriesBuilder.entries.stream().map(RegistrySetBuilder.RegistryStub::key).toList());
 
-        NexusServices.REGISTRAR.getDynamicRegistries().stream() // While the names are misleading, these are indeed all the existing datapack registries
+        NexusServices.REGISTRAR.getDynamicRegistries().stream() // While the underlying names are misleading, these are indeed all the existing datapack registries
                 .filter(data -> !builderKeys.contains(data.key()))
                 .forEach(data -> {
                     NexusConstants.LOGGER.debug("Adding dummy registry entry for empty or unmapped dynamic registry: {}", data.key().location());
                     datapackEntriesBuilder.add(data.key(), context -> {});
                 }); // Add dummy mappings for unmapped registries, just in case they're referenced elsewhere to prevent annoying NPEs among other things
 
-        return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original); // This is only run once during datagen since we only target the RSB Nexus API uses for all of its dependants
+        return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original); // This is only run once during datagen since we only populate the RSB Nexus API uses for all of its dependants
     }
 }

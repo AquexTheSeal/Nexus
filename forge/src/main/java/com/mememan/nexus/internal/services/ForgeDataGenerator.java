@@ -2,10 +2,7 @@ package com.mememan.nexus.internal.services;
 
 import com.mememan.nexus.asm.annotations.DatagenRegistrarEntry;
 import com.mememan.nexus.datagen.*;
-import com.mememan.nexus.datagen.standard.ModDataProvider;
-import com.mememan.nexus.datagen.standard.StandardDatapackRegistryProvider;
-import com.mememan.nexus.datagen.standard.StandardLanguageProvider;
-import com.mememan.nexus.datagen.standard.StandardRecipeProvider;
+import com.mememan.nexus.datagen.standard.*;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModSide;
 import com.mememan.nexus.platform.NexusServices;
@@ -138,8 +135,11 @@ public class ForgeDataGenerator implements DataGenerator {
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.LANGUAGE_PROVIDER) && onClient, new StandardLanguageProvider(modSpecificPackOutput, modId, "en_us", providersToValidate.contains(NexusProviderTypes.LANGUAGE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, DuplicateDataPolicy.CRASH)));
 
                 // Server
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.BLOCK_TAGS_PROVIDER) && onServer, new StandardBlockTagProvider(modSpecificPackOutput, regLookupProvider, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.BLOCK_TAGS_PROVIDER, DuplicateDataPolicy.CRASH)));
+
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.RECIPE_PROVIDER, DuplicateDataPolicy.CRASH)));
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER) && onServer, new StandardDatapackRegistryProvider(modSpecificPackOutput, regLookupProvider, NexusServices.REGISTRAR.getRegistrySetBuilder(), modId, providersToValidate.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER, DuplicateDataPolicy.CRASH)));
+
             });
 
             HAS_CONSUMED_GENERATORS = true;

@@ -39,7 +39,7 @@ public class StandardLanguageProvider implements ModDataProvider {
     protected final Object2ObjectOpenHashMap<Supplier<Item>, ItemPropertyWrapper> mappedModIPWs;
     protected final Object2ObjectOpenHashMap<Supplier<? extends EntityType<?>>, EntityTypePropertyWrapper<?>> mappedModETPWs;
     protected final Object2ObjectOpenHashMap<Supplier<Enchantment>, EnchantmentPropertyWrapper> mappedModEPWs;
-  //  protected final Object2ObjectOpenHashMap<Supplier<MobEffect>, MobEffectPropertyWrapper> mappedModMEPWs;
+    protected final Object2ObjectOpenHashMap<Supplier<MobEffect>, MobEffectPropertyWrapper> mappedModMEPWs;
 
     public StandardLanguageProvider(PackOutput output, String modId, String locale, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
         this.output = output;
@@ -50,7 +50,7 @@ public class StandardLanguageProvider implements ModDataProvider {
 
         this.outputPath = output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(modId).resolve("lang").resolve(locale + ".json");
 
-        //TODO Probably refactor this sometime down the road
+        //TODO Probably refactor this sometime down the road (Seriously, ts is so painful to look at 🥀)
         this.mappedModBPWs = BlockPropertyWrapper.getMappedBpws().entrySet()
                 .stream()
                 .filter(curEntry -> BuiltInRegistries.BLOCK.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
@@ -102,12 +102,25 @@ public class StandardLanguageProvider implements ModDataProvider {
 
                     if (validateAllEntries() || curEPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
                         if (curEPW.bypassDefaultTranslation() && (curEPW.getManuallyLocalizedEnchantmentName() == null || curEPW.getManuallyLocalizedEnchantmentName().isEmpty())) {
-                            throw new NullPointerException(String.format("Missing %s locale entry for enchantment %s, required by mod: %s, either because validateAllEntries is set to true or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites() (EnchantmentPropertyWrapper#bypassDefaultTranslation() is set to true, but EnchantmentPropertyWrapper#getManuallyLocalizedEntityTypeName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curEPW.getManuallyLocalizedEnchantmentName() == null ? "null" : "empty"));
+                            throw new NullPointerException(String.format("Missing %s locale entry for enchantment %s, required by mod: %s, either because validateAllEntries is set to true or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites() (EnchantmentPropertyWrapper#bypassDefaultTranslation() is set to true, but EnchantmentPropertyWrapper#getManuallyLocalizedEnchantmentName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curEPW.getManuallyLocalizedEnchantmentName() == null ? "null" : "empty"));
                         }
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
+        this.mappedModMEPWs = MobEffectPropertyWrapper.getMappedMepws().entrySet()
+                .stream()
+                .filter(curEntry -> BuiltInRegistries.MOB_EFFECT.getKey(curEntry.getKey().get()).getNamespace().equals(modId))
+                .filter(curEntry -> !curEntry.getValue().excludeFromNativeDatagen())
+                .peek(curEntry -> {
+                    MobEffectPropertyWrapper curMEPW = curEntry.getValue();
 
+                    if (validateAllEntries() || curMEPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                        if (curMEPW.bypassDefaultTranslation() && (curMEPW.getManuallyLocalizedMobEffectName() == null || curMEPW.getManuallyLocalizedMobEffectName().isEmpty())) {
+                            throw new NullPointerException(String.format("Missing %s locale entry for mob effect %s, required by mod: %s, either because validateAllEntries is set to true or the mob effect itself requires validation through MobEffectPropertyWrapper#getProviderTypeRequisites() (MobEffectPropertyWrapper#bypassDefaultTranslation() is set to true, but MobEffectPropertyWrapper#getManuallyLocalizedMobEffectName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curMEPW.getManuallyLocalizedMobEffectName() == null ? "null" : "empty"));
+                        }
+                    }
+                })
+                .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);
     }
 
     protected void addTranslations() {
@@ -220,7 +233,7 @@ public class StandardLanguageProvider implements ModDataProvider {
         boolean isAlreadyMapped = localizationEntries.containsKey(unlocalizedKey);
 
         if (isAlreadyMapped) {
-            switch (dupeStrat) {
+            switch (getDuplicateDataPolicy()) {
                 case CRASH -> throw new IllegalStateException(String.format("Attempted to localize duplicate translation key (original: %s -> %s | duplicate: %s -> %s) from mod of ID %s, specified DuplicateDataPolicy is CRASH.", unlocalizedKey, localizationEntries.get(unlocalizedKey), unlocalizedKey, localizedValue, getModId()));
                 case EXCLUDE_WARN -> NexusConstants.LOGGER.warn("Attempted to localize duplicate translation key (original: {} -> {} | duplicate: {} -> {}) from mod of ID {}, specified DuplicateDataPolicy is EXCLUDE_WARN. Skipping...", unlocalizedKey, localizationEntries.get(unlocalizedKey), unlocalizedKey, localizedValue, getModId());
                 case EXCLUDE_SILENT -> {}

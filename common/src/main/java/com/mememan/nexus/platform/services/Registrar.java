@@ -262,7 +262,7 @@ public interface Registrar {
      * <br></br>
      * Each loader has its own implementation when it comes to retrieving a collection of synced registered dynamic
      * registries, all of which boiling down to modifying {@link RegistrySynchronization#NETWORKABLE_REGISTRIES} (to
-     * be more specific, Fabric directly copes and sets, while Forge adds a hook and copies into their own custom
+     * be more specific, Fabric directly copies and sets, while Forge adds a hook and copies into their own custom
      * {@link Map}).
      * <br></br>
      * Hence, Nexus API attempts to group them appropriately, such that even custom registries not registered via Nexus

@@ -31,6 +31,7 @@ public class TestBlockRegistrar {
                     .requires(Items.ACACIA_BOAT)
                     .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(Items.ACACIA_BOAT).getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(Items.ACACIA_BOAT))
                     .save(r, new ResourceLocation("nexus", "test_block")))
+            .withBlockTag(TestBlockTags.TEST)
             .build()
             .getParentBlock();
 

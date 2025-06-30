@@ -99,7 +99,7 @@ public class FabricRegistrar implements Registrar {
     public <T> Registry<T> registerStandardRegistry(StandardRegistryBuilder<T, Registry<T>> registryBuilder) {
         Registry<T> builtReg = registryBuilder.buildAndGetRegistry();
 
-        if (!(builtReg instanceof WritableRegistry<T>)) throw new IllegalArgumentException("Registry " + registryBuilder.getRegistryKey() + " is not of type WritableRegistry. FabricRegistryBuilder requires registries to implement WritableRegistry. Nexus may update around this generic type constraint at a later point, but for now, ensure your custom registry type implements WritableRegistry.");
+        if (!(builtReg instanceof WritableRegistry<T>)) throw new IllegalArgumentException(String.format("Registry %s is not of type WritableRegistry. FabricRegistryBuilder requires registries to implement WritableRegistry. Nexus may update around this generic type constraint at a later point, but for now, ensure your custom registry type implements WritableRegistry.", registryBuilder.getRegistryKey()));
 
         FabricRegistryBuilder<T, ? extends WritableRegistry<T>> fabricRegBuilder = FabricRegistryBuilder.from((WritableRegistry<T>) builtReg);
 

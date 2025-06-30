@@ -47,8 +47,8 @@ public class DamageTypeWrapper {
     }
 
     /**
-     * Gets the cached {@link DTWBuilder} instance from the {@link #builder} if it exists. May be {@code null}. Useful for
-     * overriding specific properties after having copied another DTW instance/already set a DTWBuilder.
+     * Gets the cached {@link DTWBuilder} instance from the {@link #builder} if it exists. May be {@code null}. Useful
+     * for overriding specific properties after having copied another DTW instance/already set a DTWBuilder.
      *
      * @return The cached {@link DTWBuilder} instance, or {@code null} if the {@link #builder} is {@code null}.
      */
@@ -87,7 +87,8 @@ public class DamageTypeWrapper {
     }
 
     /**
-     * A builder class used to construct certain damage type-related data for datagen.
+     * A builder {@code class} used to construct certain damage type-related data for datagen (e.g. localized death
+     * messages).
      */
     public static class DTWBuilder {
         private final DamageTypeWrapper ownerWrapper;
