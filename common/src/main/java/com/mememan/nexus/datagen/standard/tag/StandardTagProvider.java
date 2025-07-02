@@ -6,6 +6,7 @@ import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.ProviderType;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.tag.TagWrapper;
+import com.mememan.nexus.util.StringUtil;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -22,7 +23,6 @@ import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,7 +104,7 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
 
     @Override
     public @NotNull String getName() {
-        return String.format("%s Tags [%s]", StringUtils.capitalize(registryKey.location().getPath()), getModId());
+        return String.format("%s Tags [%s]", StringUtil.toTitleCase(registryKey.location().getPath()), getModId());
     }
 
     @Override
@@ -146,7 +146,7 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
 
     protected void addTagWrappers() {
         if (!mappedModObjectTags.isEmpty()) {
-            String potentialTypeName = StringUtils.capitalize(registryKey.location().getPath());
+            String potentialTypeName = StringUtil.toTitleCase(registryKey.location().getPath());
 
             mappedModObjectTags.forEach(twEntry -> {
                 TagKey<T> parentTagKey = twEntry.getParentTag().get();
@@ -155,9 +155,10 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
                     T objectTagEntry = tagEntry.get();
 
                     if (objectTagEntry != null) {
-                        NexusConstants.LOGGER.debug("[Tagging {}}]: {} -> {} (For mod of ID: {})", potentialTypeName, objectTagEntry, parentTagKey, modId);
-
-                        if (validateDupeObjectTag(objectTagEntry, parentTagKey)) tag(parentTagKey).add(objectTagEntry);
+                        if (validateDupeObjectTag(objectTagEntry, parentTagKey)) {
+                            NexusConstants.LOGGER.debug("[Tagging {}}]: {} -> {} (For mod of ID: {})", potentialTypeName, objectTagEntry, parentTagKey, modId);
+                            tag(parentTagKey).add(objectTagEntry);
+                        }
                     }
                 });
 
@@ -165,10 +166,10 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
                     TagKey<T> storedTagKeyEntry = tagKeyEntry.get();
 
                     if (storedTagKeyEntry != null) {
-                        NexusConstants.LOGGER.debug("[Tagging {} Tag]: {} -> {} (For mod of ID: {})", potentialTypeName, storedTagKeyEntry, parentTagKey, modId);
-
                         if (validateDupeTag(parentTagKey, storedTagKeyEntry)) {
-                            tag(storedTagKeyEntry); // At least have the file for the tag present so that we can actually reference it without crashing if validateAllEntries is true
+                            NexusConstants.LOGGER.debug("[Tagging {} Tag]: {} -> {} (For mod of ID: {})", potentialTypeName, storedTagKeyEntry, parentTagKey, modId);
+
+                            if (validateAllEntries()) tag(storedTagKeyEntry); // At least have the file for the tag present so that we can actually reference it without crashing if validateAllEntries is true
                             tag(parentTagKey).addTag(storedTagKeyEntry);
                         }
                     }
@@ -178,10 +179,10 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
                     TagKey<T> storedParentTagKeyEntry = parentTagKeyEntry.get();
 
                     if (storedParentTagKeyEntry != null) {
-                        NexusConstants.LOGGER.debug("[Tagging {} Tag]: {} -> {} (For mod of ID: {})", potentialTypeName, parentTagKey, storedParentTagKeyEntry, modId);
-
                         if (validateDupeTag(storedParentTagKeyEntry, parentTagKey)) {
-                            tag(parentTagKey); // At least have the file for the tag present so that we can actually reference it without crashing if validateAllEntries is true
+                            NexusConstants.LOGGER.debug("[Tagging {} Tag]: {} -> {} (For mod of ID: {})", potentialTypeName, parentTagKey, storedParentTagKeyEntry, modId);
+
+                            if (validateAllEntries()) tag(parentTagKey); // At least have the file for the tag present so that we can actually reference it without crashing if validateAllEntries is true
                             tag(storedParentTagKeyEntry).addTag(parentTagKey);
                         }
                     }
@@ -241,7 +242,7 @@ public abstract class StandardTagProvider<T> extends IntrinsicHolderTagsProvider
                     return true;
                 }
             }
-        } else targetTags.add(targetTagKey);
+        } else targetTags.add(containedTagKey);
 
         return true;
     }

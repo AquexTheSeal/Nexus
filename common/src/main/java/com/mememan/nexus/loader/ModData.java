@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  *
  * @apiNote A {@link ModData} object may represent one mod instance, NOT to be confused with a whole JAR file. While 2
  * {@link ModData} instances may share the same exact collection of file paths as part of the same JAR (uncommon but
- * possible, as in rare cases of JiJ, for example [usually, both are unique to each other]), each instance holds its own
+ * possible, as in rare cases of JiJ, for example [usually, both are unique from each other]), each instance holds its own
  * unique metadata.
  */
 public interface ModData {

@@ -1,6 +1,5 @@
 package com.mememan.nexus.template;
 
-import com.google.common.base.Suppliers;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import com.mememan.nexus.tag.TagWrapper;
@@ -27,6 +26,6 @@ public class TestBlockTags {
     }
 
     private static Supplier<TagKey<Block>> createBlockTag(String name) {
-        return Suppliers.ofInstance(TagKey.create(Registries.BLOCK, NexusConstants.prefix(name)));
+        return () -> TagKey.create(Registries.BLOCK, NexusConstants.prefix(name));
     }
 }

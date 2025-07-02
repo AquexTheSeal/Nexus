@@ -6,10 +6,8 @@ import com.mememan.nexus.datagen.standard.ModDataProvider;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -321,7 +319,7 @@ public class EnchantmentPropertyWrapper {
      * @return The defined parent {@linkplain Supplier<TagKey<Enchantment>> Tags}, or an empty {@link ObjectArrayList} if 
      * the {@link #builder()} is {@code null}.
      */
-    public List<Supplier<TagKey<Enchantment>>> getParentEnchantmentTags() {
+    public List<Supplier<TagKey<Enchantment>>> getParentTags() {
         return builder == null ? ObjectArrayList.of() : builder.parentTags;
     }
 
@@ -386,7 +384,6 @@ public class EnchantmentPropertyWrapper {
         private boolean bypassDefaultTranslation = false;
         private boolean excludeFromNativeDatagen = false;
         private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
-        private final Map<Component, String> enchantmentTooltips = new Object2ObjectOpenHashMap<>();
 
         public EPWBuilder(EnchantmentPropertyWrapper ownerWrapper, Supplier<Enchantment> enchantmentParent) {
             this.ownerWrapper = ownerWrapper;

@@ -38,6 +38,10 @@ public enum NexusProviderTypes implements ProviderType {
      */
     DYNAMIC_REGISTRY_PROVIDER(ModSide.SERVER),
     /**
+     * Represents the {@link IntrinsicHolderTagsProvider} responsible for generating enchantment tags.
+     */
+    ENCHANTMENT_TAGS_PROVIDER(ModSide.SERVER),
+    /**
      * Represents the sub-{@link LootTableProvider} responsible for generating entity type loot tables.
      */
     ENTITY_TYPE_LOOT_SUB_PROVIDER(ModSide.SERVER),

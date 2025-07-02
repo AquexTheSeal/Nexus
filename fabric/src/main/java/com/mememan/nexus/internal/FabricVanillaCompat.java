@@ -79,12 +79,12 @@ public final class FabricVanillaCompat {
 
             // Block CMTs
             BlockPropertyWrapper.getMappedBpws().entrySet().stream()
-                    .filter(curBpwEntry -> curBpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curBpwEntry.getKey().get().asItem().getDefaultInstance()))
+                    .filter(curBpwEntry -> !curBpwEntry.getKey().get().asItem().getDefaultInstance().isEmpty() && curBpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curBpwEntry.getKey().get().asItem().getDefaultInstance()))
                     .forEach(curBpwEntry -> ItemGroupEvents.modifyEntriesEvent(targetTabKey).register(tabEntries -> tabEntries.accept(curBpwEntry.getKey().get().asItem().getDefaultInstance())));
 
             // Item CMTs
             ItemPropertyWrapper.getMappedIpws().entrySet().stream()
-                    .filter(curIpwEntry -> curIpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curIpwEntry.getKey().get().getDefaultInstance()))
+                    .filter(curIpwEntry -> !curIpwEntry.getKey().get().getDefaultInstance().isEmpty() && curIpwEntry.getValue().getParentCreativeModeTabs().stream().map(Supplier::get).anyMatch(targetTab::equals) && !targetTab.getDisplayItems().contains(curIpwEntry.getKey().get().getDefaultInstance()))
                     .forEach(curIpwEntry -> ItemGroupEvents.modifyEntriesEvent(targetTabKey).register(tabEntries -> tabEntries.accept(curIpwEntry.getKey().get().getDefaultInstance())));
         });
     }

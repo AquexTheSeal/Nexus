@@ -1,6 +1,7 @@
 package com.mememan.nexus.tag;
 
 import com.google.common.collect.ImmutableList;
+import com.mememan.nexus.NexusConstants;
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.tags.TagKey;
@@ -210,7 +211,12 @@ public class TagWrapper<T, TK extends TagKey<T>> {
      * @return An immutable view of the pre-defined {@link List} of object entries stored in this TW instance.
      */
     public ImmutableList<Supplier<T>> getPredefinedTagEntries() {
-        return storedTaggedObjects.stream().anyMatch(Objects::isNull) ? ImmutableList.of() : ImmutableList.copyOf(storedTaggedObjects);
+        return ImmutableList.copyOf(storedTaggedObjects.stream()
+                .filter(curSup -> {
+                    if (curSup == null || curSup.get() == null) NexusConstants.LOGGER.warn("Null entry found in TagWrapper for: {}. Please make sure that your tag class is being initialized after the class(es) containing the object entries you're attempting to add is/are initialized without circular dependencies (e.g. accessing your tag registrar class from the same class one of your predefined tag object entries is in [referring to blocks, items, etc.], causing an NPE to be thrown or this to happen).", parentTag.get().location());
+                    return Objects.nonNull(curSup);
+                })
+                .toList());
     }
 
     /**

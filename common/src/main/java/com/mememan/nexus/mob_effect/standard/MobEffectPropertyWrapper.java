@@ -7,10 +7,8 @@ import com.mememan.nexus.item.standard.ItemPropertyWrapper;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
@@ -386,7 +384,6 @@ public class MobEffectPropertyWrapper {
         private boolean bypassDefaultTranslation = false;
         private boolean excludeFromNativeDatagen = false;
         private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
-        private final Map<Component, String> mobEffectTooltips = new Object2ObjectOpenHashMap<>();
 
         public MEPWBuilder(MobEffectPropertyWrapper ownerWrapper, Supplier<MobEffect> mobEffectParent) {
             this.ownerWrapper = ownerWrapper;

@@ -35,7 +35,7 @@ public class StandardItemTagProvider extends StandardTagProvider<Item> {
                     Item curItem = curEntry.getKey().get();
                     ItemPropertyWrapper curIPW = curEntry.getValue();
 
-                    if (curIPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curIPW.getParentTags().isEmpty()) {
+                    if (validateAllEntries() || (curIPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curIPW.getParentTags().isEmpty())) {
                         throw new NullPointerException(String.format("No tags found for item: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites().", curItem.getDescriptionId(), modId));
                     }
                 })
@@ -51,9 +51,11 @@ public class StandardItemTagProvider extends StandardTagProvider<Item> {
                 if (!parentTags.isEmpty()) {
                     parentTags.forEach(curItemTag -> {
                         if (curItemTag != null) {
-                            NexusConstants.LOGGER.debug("[Tagging Item]: {} -> {} (For mod of ID: {})", itemSupEntry.get().getDescriptionId(), curItemTag, modId);
+                            if (validateDupeObjectTag(itemSupEntry.get(), curItemTag)) {
+                                NexusConstants.LOGGER.debug("[Tagging Item]: {} -> {} (For mod of ID: {})", itemSupEntry.get().getDescriptionId(), curItemTag, modId);
 
-                            if (validateDupeObjectTag(itemSupEntry.get(), curItemTag)) tag(curItemTag).add(itemSupEntry.get());
+                                tag(curItemTag).add(itemSupEntry.get());
+                            }
                         }
                     });
                 }

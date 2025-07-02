@@ -35,7 +35,7 @@ public class StandardBlockTagProvider extends StandardTagProvider<Block> {
                     Block curBlock = curEntry.getKey().get();
                     BlockPropertyWrapper curBPW = curEntry.getValue();
 
-                    if (curBPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curBPW.getParentTags().isEmpty() && curBPW.getParentBlockTags().isEmpty()) {
+                    if (validateAllEntries() || (curBPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curBPW.getParentTags().isEmpty() && curBPW.getParentBlockTags().isEmpty())) {
                         throw new NullPointerException(String.format("No tags found for block: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the block itself requires validation through BlockPropertyWrapper#getProviderTypeRequisites().", curBlock.getDescriptionId(), modId));
                     }
                 })
@@ -54,9 +54,11 @@ public class StandardBlockTagProvider extends StandardTagProvider<Block> {
                         if (curBlockTag != null && curBlockTag.isFor(Registries.BLOCK)) {
                             TagKey<Block> curInferredBlockTag = (TagKey<Block>) curBlockTag;
 
-                            NexusConstants.LOGGER.debug("[Tagging Block]: {} -> {} (For mod of ID: {})", blockSupEntry.get().getDescriptionId(), curBlockTag, modId);
+                            if (validateDupeObjectTag(blockSupEntry.get(), curInferredBlockTag)) {
+                                NexusConstants.LOGGER.debug("[Tagging Block]: {} -> {} (For mod of ID: {})", blockSupEntry.get().getDescriptionId(), curBlockTag, modId);
 
-                            if (validateDupeObjectTag(blockSupEntry.get(), curInferredBlockTag)) tag(curInferredBlockTag).add(blockSupEntry.get());
+                                tag(curInferredBlockTag).add(blockSupEntry.get());
+                            }
                         }
                     });
                 }
@@ -64,9 +66,11 @@ public class StandardBlockTagProvider extends StandardTagProvider<Block> {
                 if (!parentBlockTags.isEmpty()) {
                     parentBlockTags.forEach(curBlockTag -> {
                         if (curBlockTag != null) {
-                            NexusConstants.LOGGER.debug("[Tagging Block]: {} -> {} (For mod of ID: {})", blockSupEntry.get().getDescriptionId(), curBlockTag, modId);
+                            if (validateDupeObjectTag(blockSupEntry.get(), curBlockTag)) {
+                                NexusConstants.LOGGER.debug("[Tagging Block]: {} -> {} (For mod of ID: {})", blockSupEntry.get().getDescriptionId(), curBlockTag, modId);
 
-                            if (validateDupeObjectTag(blockSupEntry.get(), curBlockTag)) tag(curBlockTag).add(blockSupEntry.get());
+                                tag(curBlockTag).add(blockSupEntry.get());
+                            }
                         }
                     });
                 }

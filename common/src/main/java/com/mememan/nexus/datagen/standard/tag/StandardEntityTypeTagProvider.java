@@ -35,7 +35,7 @@ public class StandardEntityTypeTagProvider extends StandardTagProvider<EntityTyp
                     EntityType<?> curType = curEntry.getKey().get();
                     EntityTypePropertyWrapper<?> curETPW = curEntry.getValue();
 
-                    if (curETPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curETPW.getParentTags().isEmpty()) {
+                    if (validateAllEntries || (curETPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curETPW.getParentTags().isEmpty())) {
                         throw new NullPointerException(String.format("No tags found for entity type: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the entity type itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites().", curType.getDescriptionId(), modId));
                     }
                 })
@@ -51,9 +51,11 @@ public class StandardEntityTypeTagProvider extends StandardTagProvider<EntityTyp
                 if (!parentTags.isEmpty()) {
                     parentTags.forEach(curEntityTypeTag -> {
                         if (curEntityTypeTag != null) {
-                            NexusConstants.LOGGER.debug("[Tagging Entity Type]: {} -> {} (For mod of ID: {})", itemSupEntry.get().getDescriptionId(), curEntityTypeTag, modId);
+                            if (validateDupeObjectTag(itemSupEntry.get(), (TagKey<EntityType<?>>) curEntityTypeTag)) {
+                                NexusConstants.LOGGER.debug("[Tagging Entity Type]: {} -> {} (For mod of ID: {})", itemSupEntry.get().getDescriptionId(), curEntityTypeTag, modId);
 
-                            if (validateDupeObjectTag(itemSupEntry.get(), (TagKey<EntityType<?>>) curEntityTypeTag)) tag((TagKey<EntityType<?>>) curEntityTypeTag).add(itemSupEntry.get());
+                                tag((TagKey<EntityType<?>>) curEntityTypeTag).add(itemSupEntry.get());
+                            }
                         }
                     });
                 }
