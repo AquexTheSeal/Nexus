@@ -1150,7 +1150,7 @@ public class BlockPropertyWrapper {
          * Defines a custom mapping function representing the parent {@linkplain Block Block's} optional fuel value.
          *
          * @param fuelMappingFunc The mapping function accepting a representation of the parent {@linkplain Block Block's}
-         *                        optional cooke time value, in ticks. {@code null}/0 values are treated as none. Negative
+         *                        optional cook time value, in ticks. {@code null}/0 values are treated as none. Negative
          *                        values are abs'd.
          *
          * @return {@code this} (builder method).

@@ -72,7 +72,7 @@ public class StandardLanguageProvider implements ModDataProvider {
                 .peek(curEntry -> {
                     ItemPropertyWrapper curIPW = curEntry.getValue();
 
-                    if (validateAllEntries() || curIPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                    if (validateAllEntries() || curIPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) {
                         if (curIPW.bypassDefaultTranslation() && (curIPW.getManuallyLocalizedItemName() == null || curIPW.getManuallyLocalizedItemName().isEmpty())) {
                             throw new NullPointerException(String.format("Missing %s locale entry for item %s, required by mod: %s, either because validateAllEntries is set to true or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites() (ItemPropertyWrapper#bypassDefaultTranslation() is set to true, but ItemPropertyWrapper#getManuallyLocalizedItemName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curIPW.getManuallyLocalizedItemName() == null ? "null" : "empty"));
                         }
@@ -86,7 +86,7 @@ public class StandardLanguageProvider implements ModDataProvider {
                 .peek(curEntry -> {
                     EntityTypePropertyWrapper<?> curETPW = curEntry.getValue();
 
-                    if (validateAllEntries() || curETPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                    if (validateAllEntries() || curETPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) {
                         if (curETPW.bypassDefaultTranslation() && (curETPW.getManuallyLocalizedEntityTypeName() == null || curETPW.getManuallyLocalizedEntityTypeName().isEmpty())) {
                             throw new NullPointerException(String.format("Missing %s locale entry for entity type %s, required by mod: %s, either because validateAllEntries is set to true or the entity type itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites() (EntityTypePropertyWrapper#bypassDefaultTranslation() is set to true, but EntityTypePropertyWrapper#getManuallyLocalizedEntityTypeName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curETPW.getManuallyLocalizedEntityTypeName() == null ? "null" : "empty"));
                         }
@@ -100,7 +100,7 @@ public class StandardLanguageProvider implements ModDataProvider {
                 .peek(curEntry -> {
                     EnchantmentPropertyWrapper curEPW = curEntry.getValue();
 
-                    if (validateAllEntries() || curEPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                    if (validateAllEntries() || curEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) {
                         if (curEPW.bypassDefaultTranslation() && (curEPW.getManuallyLocalizedEnchantmentName() == null || curEPW.getManuallyLocalizedEnchantmentName().isEmpty())) {
                             throw new NullPointerException(String.format("Missing %s locale entry for enchantment %s, required by mod: %s, either because validateAllEntries is set to true or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites() (EnchantmentPropertyWrapper#bypassDefaultTranslation() is set to true, but EnchantmentPropertyWrapper#getManuallyLocalizedEnchantmentName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curEPW.getManuallyLocalizedEnchantmentName() == null ? "null" : "empty"));
                         }
@@ -114,7 +114,7 @@ public class StandardLanguageProvider implements ModDataProvider {
                 .peek(curEntry -> {
                     MobEffectPropertyWrapper curMEPW = curEntry.getValue();
 
-                    if (validateAllEntries() || curMEPW.getProviderTypeRequisites().getOrDefault(NexusProviderTypes.LANGUAGE_PROVIDER, false)) {
+                    if (validateAllEntries() || curMEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) {
                         if (curMEPW.bypassDefaultTranslation() && (curMEPW.getManuallyLocalizedMobEffectName() == null || curMEPW.getManuallyLocalizedMobEffectName().isEmpty())) {
                             throw new NullPointerException(String.format("Missing %s locale entry for mob effect %s, required by mod: %s, either because validateAllEntries is set to true or the mob effect itself requires validation through MobEffectPropertyWrapper#getProviderTypeRequisites() (MobEffectPropertyWrapper#bypassDefaultTranslation() is set to true, but MobEffectPropertyWrapper#getManuallyLocalizedMobEffectName() is %s)", locale, curEntry.getKey().get().getDescriptionId(), modId, curMEPW.getManuallyLocalizedMobEffectName() == null ? "null" : "empty"));
                         }

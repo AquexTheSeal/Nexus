@@ -1,8 +1,9 @@
-package com.mememan.nexus.datagen.standard;
+package com.mememan.nexus.datagen.standard.model;
 
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.datagen.ProviderType;
+import com.mememan.nexus.datagen.standard.ModDataProvider;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.models.BlockModelGenerators;
