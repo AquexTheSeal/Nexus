@@ -319,7 +319,7 @@ public class MobEffectPropertyWrapper {
      * @return The defined parent {@linkplain Supplier<TagKey<MobEffect>> Tags}, or an empty {@link ObjectArrayList} if the
      * {@link #builder()} is {@code null}.
      */
-    public List<Supplier<TagKey<MobEffect>>> getParentMobEffectTags() {
+    public List<Supplier<TagKey<MobEffect>>> getParentTags() {
         return builder == null ? ObjectArrayList.of() : builder.parentTags;
     }
 

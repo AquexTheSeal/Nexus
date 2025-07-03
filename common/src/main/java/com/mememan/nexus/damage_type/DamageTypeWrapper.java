@@ -1,12 +1,18 @@
 package com.mememan.nexus.damage_type;
 
 import com.google.common.collect.ImmutableSortedMap;
+import com.mememan.nexus.datagen.ProviderType;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -95,6 +101,9 @@ public class DamageTypeWrapper {
         private final Supplier<ResourceKey<DamageType>> ownerDamageType;
         @Nullable
         private String localizedDeathMessageComponent;
+        private final List<Supplier<TagKey<DamageType>>> parentTags = ObjectArrayList.of();
+        private boolean excludeFromNativeDatagen = false;
+        private final Map<ProviderType, Boolean> mappedProviderRequisites = new Object2BooleanOpenHashMap<>();
 
         private DTWBuilder(DamageTypeWrapper ownerWrapper, Supplier<ResourceKey<DamageType>> ownerDamageType) {
             this.ownerWrapper = ownerWrapper;

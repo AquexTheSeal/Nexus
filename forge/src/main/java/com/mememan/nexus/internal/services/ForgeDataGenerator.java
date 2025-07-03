@@ -3,10 +3,7 @@ package com.mememan.nexus.internal.services;
 import com.mememan.nexus.asm.annotations.DatagenRegistrarEntry;
 import com.mememan.nexus.datagen.*;
 import com.mememan.nexus.datagen.standard.*;
-import com.mememan.nexus.datagen.standard.tag.StandardBlockTagProvider;
-import com.mememan.nexus.datagen.standard.tag.StandardEnchantmentTagProvider;
-import com.mememan.nexus.datagen.standard.tag.StandardEntityTypeTagProvider;
-import com.mememan.nexus.datagen.standard.tag.StandardItemTagProvider;
+import com.mememan.nexus.datagen.standard.tag.*;
 import com.mememan.nexus.loader.ModData;
 import com.mememan.nexus.loader.ModSide;
 import com.mememan.nexus.platform.NexusServices;
@@ -143,6 +140,7 @@ public class ForgeDataGenerator implements DataGenerator {
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.ITEM_TAGS_PROVIDER) && onServer, new StandardItemTagProvider(modSpecificPackOutput, regLookupProvider, modId, providersToValidate.contains(NexusProviderTypes.ITEM_TAGS_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.ITEM_TAGS_PROVIDER, DuplicateDataPolicy.CRASH)));
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.ENTITY_TYPE_TAGS_PROVIDER) && onServer, new StandardEntityTypeTagProvider(modSpecificPackOutput, regLookupProvider, modId, providersToValidate.contains(NexusProviderTypes.ENTITY_TYPE_TAGS_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.ENTITY_TYPE_TAGS_PROVIDER, DuplicateDataPolicy.CRASH)));
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.ENCHANTMENT_TAGS_PROVIDER) && onServer, new StandardEnchantmentTagProvider(modSpecificPackOutput, regLookupProvider, modId, providersToValidate.contains(NexusProviderTypes.ENCHANTMENT_TAGS_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.ENCHANTMENT_TAGS_PROVIDER, DuplicateDataPolicy.CRASH)));
+                primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.MOB_EFFECT_TAGS_PROVIDER) && onServer, new StandardMobEffectTagProvider(modSpecificPackOutput, regLookupProvider, modId, providersToValidate.contains(NexusProviderTypes.MOB_EFFECT_TAGS_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.MOB_EFFECT_TAGS_PROVIDER, DuplicateDataPolicy.CRASH)));
 
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.RECIPE_PROVIDER) && onServer, new StandardRecipeProvider(modSpecificPackOutput, modId, providersToValidate.contains(NexusProviderTypes.RECIPE_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.RECIPE_PROVIDER, DuplicateDataPolicy.CRASH)));
                 primaryGen.addProvider(allowDatagenForMod && !disabledProviders.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER) && onServer, new StandardDatapackRegistryProvider(modSpecificPackOutput, regLookupProvider, NexusServices.REGISTRAR.getRegistrySetBuilder(), modId, providersToValidate.contains(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER), mappedDupeStrats.getOrDefault(NexusProviderTypes.DYNAMIC_REGISTRY_PROVIDER, DuplicateDataPolicy.CRASH)));

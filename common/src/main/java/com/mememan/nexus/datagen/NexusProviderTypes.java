@@ -62,6 +62,10 @@ public enum NexusProviderTypes implements ProviderType {
      */
     LANGUAGE_PROVIDER(ModSide.CLIENT),
     /**
+     * Represents the {@link IntrinsicHolderTagsProvider} responsible for generating mob effect tags.
+     */
+    MOB_EFFECT_TAGS_PROVIDER(ModSide.SERVER),
+    /**
      * Represents the general {@link RecipeProvider} responsible for generating both block and item recipes.
      */
     RECIPE_PROVIDER(ModSide.SERVER),
