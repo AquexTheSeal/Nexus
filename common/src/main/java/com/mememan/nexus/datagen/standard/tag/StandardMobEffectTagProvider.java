@@ -35,8 +35,8 @@ public class StandardMobEffectTagProvider extends StandardTagProvider<MobEffect>
                     MobEffect curMobEffect = curEntry.getKey().get();
                     MobEffectPropertyWrapper curMEPW = curEntry.getValue();
 
-                    if (validateAllEntries() || (curMEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curMEPW.getParentTags().isEmpty())) {
-                        throw new NullPointerException(String.format("No tags found for mob effect: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the mob effect itself requires validation through MobEffectPropertyWrapper#getProviderTypeRequisites().", curMobEffect.getDescriptionId(), modId));
+                    if ((validateAllEntries() || curMEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) && curMEPW.getParentTags().isEmpty()) {
+                        throw new IllegalStateException(String.format("No tags found for mob effect: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the mob effect itself requires validation through MobEffectPropertyWrapper#getProviderTypeRequisites().", curMobEffect.getDescriptionId(), modId));
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);

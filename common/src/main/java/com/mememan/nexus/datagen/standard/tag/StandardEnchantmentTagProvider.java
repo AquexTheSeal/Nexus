@@ -35,8 +35,8 @@ public class StandardEnchantmentTagProvider extends StandardTagProvider<Enchantm
                     Enchantment curEnchantment = curEntry.getKey().get();
                     EnchantmentPropertyWrapper curEPW = curEntry.getValue();
 
-                    if (validateAllEntries() || (curEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curEPW.getParentTags().isEmpty())) {
-                        throw new NullPointerException(String.format("No tags found for enchantment: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites().", curEnchantment.getDescriptionId(), modId));
+                    if ((validateAllEntries() || curEPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) && curEPW.getParentTags().isEmpty()) {
+                        throw new IllegalStateException(String.format("No tags found for enchantment: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the enchantment itself requires validation through EnchantmentPropertyWrapper#getProviderTypeRequisites().", curEnchantment.getDescriptionId(), modId));
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);

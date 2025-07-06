@@ -538,7 +538,7 @@ public class EnchantmentPropertyWrapper {
         /**
          * Tags this EPWBuilder's parent {@link Enchantment} with the provided {@link TagKey<Enchantment>}.
          *
-         * @param parentEnchantmentTag The {@code TagKey<Enchantment>} with which this IPW's parent {@link Enchantment}
+         * @param parentEnchantmentTag The {@code TagKey<Enchantment>} with which this EPW's parent {@link Enchantment}
          *                             will be tagged. May only be of type {@link Enchantment}.
          *
          * @return {@code this} (builder method).
@@ -552,7 +552,7 @@ public class EnchantmentPropertyWrapper {
          * Tags this EPWBuilder's parent {@link Enchantment} with the provided {@linkplain TagKey<Enchantment> Tags}.
          * Appends to the existing list.
          *
-         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this IPW's parent {@link Enchantment}
+         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this EPW's parent {@link Enchantment}
          *                              will be tagged. May only be of type {@link Enchantment}.
          *
          * @return {@code this} (builder method).
@@ -568,7 +568,7 @@ public class EnchantmentPropertyWrapper {
          * Tags this EPWBuilder's parent Enchantment with the provided {@linkplain TagKey<Enchantment> Tags}. Overwrites
          * the existing {@link List}.
          *
-         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this IPW's parent
+         * @param parentEnchantmentTags The {@linkplain TagKey<Enchantment> TagKeys} with which this EPW's parent
          *                              {@link Enchantment} will be tagged. May only be of type {@link Enchantment}.
          *
          * @return {@code this} (builder method).

@@ -538,7 +538,7 @@ public class MobEffectPropertyWrapper {
         /**
          * Tags this MEPWBuilder's parent {@link MobEffect} with the provided {@link TagKey<MobEffect>}.
          *
-         * @param parentMobEffectTag The {@code TagKey<MobEffect>} with which this IPW's parent {@link MobEffect} will
+         * @param parentMobEffectTag The {@code TagKey<MobEffect>} with which this MEPW's parent {@link MobEffect} will
          *                           be tagged. May only be of type {@link MobEffect}.
          *
          * @return {@code this} (builder method).
@@ -552,7 +552,7 @@ public class MobEffectPropertyWrapper {
          * Tags this MEPWBuilder's parent {@link MobEffect} with the provided {@linkplain TagKey<MobEffect> Tags}. Appends
          * to the existing list.
          *
-         * @param parentMobEffectTags The {@linkplain TagKey<MobEffect> TagKeys} with which this IPW's parent {@link MobEffect}
+         * @param parentMobEffectTags The {@linkplain TagKey<MobEffect> TagKeys} with which this MEPW's parent {@link MobEffect}
          *                            will be tagged. May only be of type {@link MobEffect}.
          *
          * @return {@code this} (builder method).
@@ -568,7 +568,7 @@ public class MobEffectPropertyWrapper {
          * Tags this MEPWBuilder's parent MobEffect with the provided {@linkplain TagKey<MobEffect> Tags}. Overwrites
          * the existing {@link List}.
          *
-         * @param parentMobEffectTags The {@linkplain TagKey<MobEffect> TagKeys} with which this IPW's parent {@link MobEffect}
+         * @param parentMobEffectTags The {@linkplain TagKey<MobEffect> TagKeys} with which this MEPW's parent {@link MobEffect}
          *                            will be tagged. May only be of type {@link MobEffect}.
          *
          * @return {@code this} (builder method).

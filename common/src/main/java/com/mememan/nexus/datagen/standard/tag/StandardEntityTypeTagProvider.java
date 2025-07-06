@@ -35,8 +35,8 @@ public class StandardEntityTypeTagProvider extends StandardTagProvider<EntityTyp
                     EntityType<?> curType = curEntry.getKey().get();
                     EntityTypePropertyWrapper<?> curETPW = curEntry.getValue();
 
-                    if (validateAllEntries || (curETPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curETPW.getParentTags().isEmpty())) {
-                        throw new NullPointerException(String.format("No tags found for entity type: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the entity type itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites().", curType.getDescriptionId(), modId));
+                    if ((validateAllEntries() || curETPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) && curETPW.getParentTags().isEmpty()) {
+                        throw new IllegalStateException(String.format("No tags found for entity type: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the entity type itself requires validation through EntityTypePropertyWrapper#getProviderTypeRequisites().", curType.getDescriptionId(), modId));
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);

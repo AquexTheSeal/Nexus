@@ -35,8 +35,8 @@ public class StandardItemTagProvider extends StandardTagProvider<Item> {
                     Item curItem = curEntry.getKey().get();
                     ItemPropertyWrapper curIPW = curEntry.getValue();
 
-                    if (validateAllEntries() || (curIPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curIPW.getParentTags().isEmpty())) {
-                        throw new NullPointerException(String.format("No tags found for item: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites().", curItem.getDescriptionId(), modId));
+                    if ((validateAllEntries() || curIPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) && curIPW.getParentTags().isEmpty()) {
+                        throw new IllegalStateException(String.format("No tags found for item: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the item itself requires validation through ItemPropertyWrapper#getProviderTypeRequisites().", curItem.getDescriptionId(), modId));
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);

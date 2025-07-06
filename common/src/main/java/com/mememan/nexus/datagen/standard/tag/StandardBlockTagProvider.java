@@ -35,8 +35,8 @@ public class StandardBlockTagProvider extends StandardTagProvider<Block> {
                     Block curBlock = curEntry.getKey().get();
                     BlockPropertyWrapper curBPW = curEntry.getValue();
 
-                    if (validateAllEntries() || (curBPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false) && curBPW.getParentTags().isEmpty() && curBPW.getParentBlockTags().isEmpty())) {
-                        throw new NullPointerException(String.format("No tags found for block: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the block itself requires validation through BlockPropertyWrapper#getProviderTypeRequisites().", curBlock.getDescriptionId(), modId));
+                    if ((validateAllEntries() || curBPW.getProviderTypeRequisites().getOrDefault(getProviderType(), false)) && curBPW.getParentTags().isEmpty() && curBPW.getParentBlockTags().isEmpty()) {
+                        throw new IllegalStateException(String.format("No tags found for block: %s (Required by mod of ID: %s), either because validateAllEntries is set to true for this provider or the block itself requires validation through BlockPropertyWrapper#getProviderTypeRequisites().", curBlock.getDescriptionId(), modId));
                     }
                 })
                 .collect(Object2ObjectOpenHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Object2ObjectOpenHashMap::putAll);

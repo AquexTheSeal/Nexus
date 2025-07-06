@@ -10,10 +10,9 @@ public final class StringUtil {
         throw new IllegalAccessError("Attempted to construct instance of utility class! (StringUtil)");
     }
 
-
     /**
-     * Capitalizes a {@link String} in the format of {@code some_lower_case_string} into a title case {@link String},
-     * i.e. {@code Some Lower Case String}.
+     * Capitalizes a {@link String} formatted in snake case into a title case {@link String},
+     * e.g. {@code "some_lower_case_string"} -> {@code "Some Lower Case String"}.
      *
      * @param targetString the {@link String} to capitalize.
      *

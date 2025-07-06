@@ -8,6 +8,7 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,6 +34,10 @@ public enum NexusProviderTypes implements ProviderType {
      * Represents the {@link IntrinsicHolderTagsProvider} responsible for generating block tags.
      */
     BLOCK_TAGS_PROVIDER(ModSide.SERVER),
+    /**
+     * Represents the {@link TagsProvider} responsible for generating damage type tags.
+     */
+    DAMAGE_TYPE_TAGS_PROVIDER(ModSide.SERVER),
     /**
      * Represents the {@link RegistriesDatapackGenerator} responsible for generating all datapack registry files.
      */
