@@ -392,7 +392,7 @@ public class EnchantmentPropertyWrapper {
 
         /**
          * Assigns a custom translation key for datagen. By default, a basic regex algorithm is used to automatically localize
-         * the block name into something more legible (I.E. The names you see in-game). This property is simply an override
+         * the enchantment name into something more legible (I.E. The names you see in-game). This property is simply an override
          * mechanic which aims to give the end-developer more control over the resulting name instead of being forced to rely on
          * the aforementioned algorithm.
          * <br></br>
@@ -454,8 +454,8 @@ public class EnchantmentPropertyWrapper {
         }
 
         /**
-         * A custom {@link Function} to apply miscellaneous modifications to the resulting localized block name. This is
-         * influenced by {@link #withCustomName(String)} and {@link #literalTranslation(boolean)}, where applicable.
+         * A custom {@link Function} to apply miscellaneous modifications to the resulting localized enchantment name.
+         * This is influenced by {@link #withCustomName(String)} and {@link #literalTranslation(boolean)}, where applicable.
          *
          * @param enchantmentTranslationFunc The {@link Function} responsible for directly modifying the resulting
          *                                   localized enchantment name.
@@ -587,7 +587,7 @@ public class EnchantmentPropertyWrapper {
          * Fundamentally, all this does is flag this instance as not needing a data entry to be mapped to it. You may
          * choose to generate data for it yourself if needed, since Nexus won't handle datagen for this particular object.
          * <br></br>
-         * If a block-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
+         * If a enchantment-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
          * instance (and its children, so long as this value isn't modified) will still be excluded from datagen, and thus
          * an exception won't be thrown for it.
          *
@@ -605,7 +605,7 @@ public class EnchantmentPropertyWrapper {
         }
 
         /**
-         * Determines whether this EPWBuilder instance is required to generate necessary block-related data based on the
+         * Determines whether this EPWBuilder instance is required to generate necessary enchantment-related data based on the
          * {@link ProviderType} passed in.
          * <br></br>
          * By default, unmapped providers will not require an entry for this EPWBuilder to be generated unless

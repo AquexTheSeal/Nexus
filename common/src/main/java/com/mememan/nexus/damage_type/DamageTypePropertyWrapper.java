@@ -337,7 +337,7 @@ public class DamageTypePropertyWrapper {
          * Fundamentally, all this does is flag this instance as not needing a data entry to be mapped to it. You may
          * choose to generate data for it yourself if needed, since Nexus won't handle datagen for this particular object.
          * <br></br>
-         * If a block-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
+         * If a damage type-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
          * instance (and its children, so long as this value isn't modified) will still be excluded from datagen, and thus
          * an exception won't be thrown for it.
          *
@@ -355,8 +355,8 @@ public class DamageTypePropertyWrapper {
         }
 
         /**
-         * Determines whether this DTPWBuilder instance is required to generate necessary block-related data based on the
-         * {@link ProviderType} passed in.
+         * Determines whether this DTPWBuilder instance is required to generate necessary damage type-related data based
+         * on the {@link ProviderType} passed in.
          * <br></br>
          * By default, unmapped providers will not require an entry for this DTPWBuilder to be generated unless
          * {@link ModDataProvider#validateAllEntries()} is set to {@code true}.
@@ -454,7 +454,7 @@ public class DamageTypePropertyWrapper {
          * @return The newly data-populated {@link DamageTypePropertyWrapper}.
          */
         public DamageTypePropertyWrapper build() {
-            MAPPED_DTPWS.putIfAbsent(ownerDamageType, ownerWrapper);
+            if (!ownerWrapper.isTemplate()) MAPPED_DTPWS.putIfAbsent(ownerDamageType, ownerWrapper);
             return ownerWrapper;
         }
     }

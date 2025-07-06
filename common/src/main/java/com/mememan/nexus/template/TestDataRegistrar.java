@@ -4,11 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.mememan.nexus.NexusConstants;
 import com.mememan.nexus.asm.annotations.RegistrarEntry;
 import com.mememan.nexus.damage_type.DamageTypePropertyWrapper;
+import com.mememan.nexus.datagen.NexusProviderTypes;
 import com.mememan.nexus.platform.NexusServices;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageType;
 
 import java.util.function.Supplier;
@@ -21,6 +23,8 @@ public class TestDataRegistrar {
     public static final Supplier<ResourceKey<DamageType>> THORNY_SUN = DamageTypePropertyWrapper.create(registerDamageType("thorny_sun", () -> new DamageType("thorny_sun", 0.1F)))
             .builder()
             .withLocalizedDeathMessageComponent("%1$s was pricked to death by a Thorny Sun")
+            .withTag(() -> DamageTypeTags.BYPASSES_ARMOR)
+            .requiresDatagenEntry(NexusProviderTypes.DAMAGE_TYPE_TAGS_PROVIDER, true)
             .build()
             .getOwnerDamageType();
 

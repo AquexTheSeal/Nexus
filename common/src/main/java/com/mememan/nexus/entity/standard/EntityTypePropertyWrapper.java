@@ -593,7 +593,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
         }
 
         /**
-         * Tags this ETPWBuilder's parent block with the provided {@linkplain TagKey<EntityType<E>> Tags}.
+         * Tags this ETPWBuilder's parent entity type with the provided {@linkplain TagKey<EntityType<E>> Tags}.
          * Overwrites the existing list.
          *
          * @param parentEntityTypeTags The {@linkplain TagKey<EntityType<E>> TagKeys} with which this ETPW's
@@ -641,7 +641,7 @@ public class EntityTypePropertyWrapper<E extends Entity> {
          * Fundamentally, all this does is flag this instance as not needing a data entry to be mapped to it. You may
          * choose to generate data for it yourself if needed, since Nexus won't handle datagen for this particular object.
          * <br></br>
-         * If a block-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
+         * If an entity type-specific data provider has {@link ModDataProvider#validateAllEntries()} set to {@code true}, this
          * instance (and its children, so long as this value isn't modified) will still be excluded from datagen, and thus
          * an exception won't be thrown for it.
          *
