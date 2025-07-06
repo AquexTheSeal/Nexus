@@ -33,6 +33,6 @@ public final class StringUtil {
             if (curChar == '_') capitalizeNext = true;
         }
 
-        return titleCaseBuilder.toString();
+        return titleCaseBuilder.toString().replaceAll("_", " ");
     }
 }

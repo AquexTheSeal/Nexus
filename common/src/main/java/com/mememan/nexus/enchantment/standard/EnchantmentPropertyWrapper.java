@@ -605,8 +605,8 @@ public class EnchantmentPropertyWrapper {
         }
 
         /**
-         * Determines whether this EPWBuilder instance is required to generate necessary enchantment-related data based on the
-         * {@link ProviderType} passed in.
+         * Determines whether this EPWBuilder instance is required to generate necessary enchantment-related data based
+         * on the {@link ProviderType} passed in.
          * <br></br>
          * By default, unmapped providers will not require an entry for this EPWBuilder to be generated unless
          * {@link ModDataProvider#validateAllEntries()} is set to {@code true}.
