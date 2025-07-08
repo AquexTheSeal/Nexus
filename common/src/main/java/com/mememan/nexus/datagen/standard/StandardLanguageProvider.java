@@ -126,8 +126,10 @@ public class StandardLanguageProvider implements ModDataProvider {
     protected void addTranslations() {
         // Native types
         handleBlockTranslations();
+        handleEnchantmentTranslations();
         handleEntityTypeTranslations();
         handleItemTranslations();
+        handleMobEffectTranslations();
 
         // Misc. types
 
@@ -137,11 +139,19 @@ public class StandardLanguageProvider implements ModDataProvider {
 
     }
 
+    protected void handleEnchantmentTranslations() {
+
+    }
+
     protected void handleEntityTypeTranslations() {
 
     }
 
     protected void handleItemTranslations() {
+
+    }
+
+    protected void handleMobEffectTranslations() {
 
     }
 

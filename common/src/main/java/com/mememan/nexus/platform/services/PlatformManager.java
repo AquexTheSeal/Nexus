@@ -102,7 +102,7 @@ public interface PlatformManager {
      *
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
-     *                           <b>before</b> loading them. May be {@code null}.
+     *                           <b>before</b> initializing them. May be {@code null}.
      * @param beforeClassInitConsumer Some task to be run before class initialization but after sorting. May
      *                                be {@code null}.
      *
@@ -118,7 +118,7 @@ public interface PlatformManager {
      *
      * @param annotationTypeClazz The annotation type class.
      * @param classLoadingSorter A {@link Comparator} for sorting the discovered classes. Mind that this sorts classes
-     *                           <b>before</b> loading them. May be {@code null}.
+     *                           <b>before</b> initializing them. May be {@code null}.
      *
      * @return A {@link List} of (loaded) classes annotated with the specified annotation type. May be empty.
      */

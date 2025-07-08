@@ -125,7 +125,7 @@ public class StandardDatapackRegistryProvider extends RegistriesDatapackGenerato
         NexusServices.REGISTRAR.getDynamicRegistries().stream() // While the underlying names are misleading, these are indeed all the existing datapack registries
                 .filter(data -> !builderKeys.contains(data.key()))
                 .forEach(data -> {
-                    NexusConstants.LOGGER.debug("Adding dummy registry entry for empty or unmapped dynamic registry: {}", data.key().location());
+                    NexusConstants.LOGGER.debug("[StandardDatapackRegistryProvider Constructor] Adding dummy registry entry for empty or unmapped dynamic registry: {}", data.key().location());
                     datapackEntriesBuilder.add(data.key(), context -> {});
                 }); // Add dummy mappings for unmapped registries, just in case they're referenced elsewhere to prevent annoying NPEs among other things
 

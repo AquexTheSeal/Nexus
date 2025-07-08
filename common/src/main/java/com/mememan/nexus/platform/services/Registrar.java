@@ -93,6 +93,8 @@ import java.util.function.Supplier;
  * </pre>
  *
  * For more information, see the references below.
+ *
+ * @see <a href="https://github.com/RaveTr/Nexus/wiki/registrars">Nexus Wiki: Registrars</a>
  */
 public interface Registrar {
 
@@ -103,7 +105,7 @@ public interface Registrar {
      * Functionally speaking, all this method does is properly load and cache registry information on startup. It also
      * handles loading all classes annotated with {@link RegistrarEntry}.
      * <br></br>
-     * Dependant mods may choose to opt out of this auto-loading feature either by simply not annotating their classes
+     * Dependant mods may choose to opt out of this auto-loading feature by simply not annotating their classes
      * with {@link RegistrarEntry}. It should, however, be noted that mods not using this annotation will have to
      * statically-initialize their classes in some way (bootstrap methods, custom annotation discovery, etc.) in order
      * for object registration to actually occur.

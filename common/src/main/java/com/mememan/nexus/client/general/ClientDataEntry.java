@@ -22,7 +22,7 @@ public class ClientDataEntry {
     }
 
     /**
-     * Builder {@code class} used to build and store client data (such as tooltips, renderers, models, etc.).
+     * Builder {@code class} used to build and store client data (tooltips, renderers, models, etc.).
      */
     public static class CDEBuilder {
         @NotNull
