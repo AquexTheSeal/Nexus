@@ -102,6 +102,9 @@ accessible field net/minecraft/data/recipes/RecipeProvider advancementPathProvid
 
 # ModelProvider
 extendable method net/minecraft/data/models/ModelProvider getName ()Ljava/lang/String;
+accessible method net/minecraft/data/models/ModelProvider saveCollection (Lnet/minecraft/data/CachedOutput;Ljava/util/Map;Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/data/models/ModelProvider modelPathProvider Lnet/minecraft/data/PackOutput$PathProvider;
+accessible field net/minecraft/data/models/ModelProvider blockStatePathProvider Lnet/minecraft/data/PackOutput$PathProvider;
 
 # RegistriesDatapackGenerator
 extendable method net/minecraft/data/registries/RegistriesDatapackGenerator getName ()Ljava/lang/String;

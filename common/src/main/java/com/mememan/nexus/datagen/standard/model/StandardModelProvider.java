@@ -14,7 +14,6 @@ public abstract class StandardModelProvider<T> extends ModelProvider implements 
     protected final String modId;
     protected final boolean validateAllEntries;
     protected final DuplicateDataPolicy dupeStrat;
-    protected final PackOutput.PathProvider blockModelPathProvider;
 
     public StandardModelProvider(PackOutput targetPackOutput, String modId, boolean validateAllEntries, DuplicateDataPolicy dupeStrat) {
         super(targetPackOutput);
@@ -22,12 +21,9 @@ public abstract class StandardModelProvider<T> extends ModelProvider implements 
         this.modId = modId;
         this.validateAllEntries = validateAllEntries;
         this.dupeStrat = dupeStrat;
-        this.blockModelPathProvider = targetPackOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
     }
 
-    public void generateModels() {
-
-    }
+    public abstract void generateModels();
 
     @Override
     public @NotNull CompletableFuture<?> run(CachedOutput cachedOutput) {
@@ -36,7 +32,7 @@ public abstract class StandardModelProvider<T> extends ModelProvider implements 
 
     @Override
     public @NotNull String getName() {
-        return super.getName() + " [" + getModId() + "]";
+        return String.format("Models [%s] [%s]", getTypeName(), getModId());
     }
 
     @Override
@@ -51,6 +47,8 @@ public abstract class StandardModelProvider<T> extends ModelProvider implements 
 
     @Override
     public abstract @NotNull ProviderType getProviderType();
+
+    public abstract String getTypeName();
 
     @Override
     public @NotNull DuplicateDataPolicy getDuplicateDataPolicy() {

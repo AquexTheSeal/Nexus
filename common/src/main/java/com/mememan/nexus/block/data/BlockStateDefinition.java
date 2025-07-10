@@ -34,7 +34,9 @@ public class BlockStateDefinition {
     }
 
     /**
-     * Sets this BSD's {@link BlockStateGenerator}. Generally speaking, there are 2 known implementations of this
+     * Sets this BSD's {@link BlockStateGenerator}.
+     * <br></br>
+     * Generally speaking, there are 2 known implementations of this
      * {@code interface} ({@link MultiPartGenerator} and {@link MultiVariantGenerator}), and they're likely the only
      * implementations you'll ever need. However, since you only need to pass their parent {@code interface} in, you're
      * not conformed to the 2 aforementioned types when working with BSDs.

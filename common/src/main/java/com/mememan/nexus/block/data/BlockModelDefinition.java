@@ -86,7 +86,7 @@ public class BlockModelDefinition {
      * methods that don't take any parameters.
      *
      * @param blockRenderType The target {@linkplain RenderType render type's} {@link ResourceLocation}
-     *                        (E.G. {@code "minecraft:cutout"}).
+     *                        (e.g. {@code "minecraft:cutout"}).
      *
      * @return {@code this} (builder method)
      *

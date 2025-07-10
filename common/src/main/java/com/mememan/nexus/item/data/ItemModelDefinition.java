@@ -103,6 +103,12 @@ public class ItemModelDefinition {
      * predicates (fulfilled based on the criteria of the value's... well, value) per
      * {@link ResourceLocation ResourceLocation} representing the item model to delegate to if said predicate(s)
      * is/are fulfilled.
+     * <br></br>
+     * An entry would generally be structured as:
+     * <br>
+     * K: {@code Map.of(new ResourceLocation(""mymodid:my_predicate_location""), 1.0F, ...)},
+     * <p></p>
+     * V: {@code new ResourceLocation("mymodid:my_conditional_texture_location")}.
      *
      * @param textureOverrides The custom map of texture overrides for the item model.
      *
