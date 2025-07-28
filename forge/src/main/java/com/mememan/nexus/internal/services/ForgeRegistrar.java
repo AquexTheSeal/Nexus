@@ -21,6 +21,10 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.*;
@@ -151,6 +155,14 @@ public class ForgeRegistrar implements Registrar {
         return DataPackRegistriesHooksAccessor.getNetworkableRegistries();
     }
 
+    public static RegistrySetBuilder getDatapackRegistrySetBuilder() {
+        return DATAPACK_REGISTRY_SET_BUILDER == null ? DATAPACK_REGISTRY_SET_BUILDER = new RegistrySetBuilder() : DATAPACK_REGISTRY_SET_BUILDER;
+    }
+
+    public static ImmutableMap<String, Object2ObjectOpenHashMap<ResourceKey<?>, DeferredRegister<?>>> getCachedRegistries() {
+        return ImmutableMap.copyOf(CACHED_REGISTRIES);
+    }
+
     protected <T> Supplier<T> tCastObjSupMappingFunc(Function<? extends BootstapContext<?>, ? extends Supplier<?>> objSupMappingFunc, BootstapContext<T> bootstapContext) { // I love wildcard casts
         return ((Function<BootstapContext<T>, Supplier<T>>) objSupMappingFunc).apply(bootstapContext);
     }
@@ -163,11 +175,11 @@ public class ForgeRegistrar implements Registrar {
         return (ResourceKey<Registry<T>>) registryKey;
     }
 
-    public static RegistrySetBuilder getDatapackRegistrySetBuilder() {
-        return DATAPACK_REGISTRY_SET_BUILDER == null ? DATAPACK_REGISTRY_SET_BUILDER = new RegistrySetBuilder() : DATAPACK_REGISTRY_SET_BUILDER;
+    private static void onAddReloadListenerEvent(AddReloadListenerEvent event) {
+        
     }
 
-    public static ImmutableMap<String, Object2ObjectOpenHashMap<ResourceKey<?>, DeferredRegister<?>>> getCachedRegistries() {
-        return ImmutableMap.copyOf(CACHED_REGISTRIES);
+    private static void onDatapackSyncEvent(OnDatapackSyncEvent event) {
+
     }
 }

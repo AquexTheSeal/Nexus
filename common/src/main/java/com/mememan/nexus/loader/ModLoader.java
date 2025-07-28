@@ -5,7 +5,7 @@ package com.mememan.nexus.loader;
  */
 public enum ModLoader {
     FORGE("Forge"),
-    NEOFORGE("NeoForge"),
+    NEOFORGE("NeoForge"), // Currently unused in 1.20.1 (duh)
     FABRIC("Fabric");
 
     private final String platformName;

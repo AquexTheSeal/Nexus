@@ -24,4 +24,17 @@ import java.util.Set;
  *                              from datagen.
  */
 public record ModDatagenConfig(@NotNull String modId, boolean enableDatagen, Map<ProviderType, DuplicateDataPolicy> mappedDupeStrats, Set<ProviderType> providerTypesToFullyValidate, Set<ProviderType> disabledProviderTypes) {
+
+    /**
+     * Helper factory method for creating a {@link ModDatagenConfig} object that runs all provider types for the
+     * specified {@code modId} using default configurations.
+     *
+     * @param modId The parent mod ID under which the specified data should be configured/stored.
+     *
+     * @return A {@link ModDatagenConfig} object that runs all provider types for the specified {@code modId} using
+     * default configurations.
+     */
+    public static ModDatagenConfig defaultConfig(String modId) {
+        return new ModDatagenConfig(modId, true, Map.of(), Set.of(), Set.of());
+    }
 }

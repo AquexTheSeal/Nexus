@@ -1,5 +1,6 @@
 package com.mememan.nexus.datagen.standard.model;
 
+import com.google.gson.JsonElement;
 import com.mememan.nexus.datagen.DuplicateDataPolicy;
 import com.mememan.nexus.datagen.ProviderType;
 import com.mememan.nexus.datagen.standard.ModDataProvider;
@@ -9,8 +10,9 @@ import net.minecraft.data.models.ModelProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
-public abstract class StandardModelProvider<T> extends ModelProvider implements ModDataProvider {
+public abstract class StandardModelProvider<JES extends Supplier<JsonElement>> extends ModelProvider implements ModDataProvider {
     protected final String modId;
     protected final boolean validateAllEntries;
     protected final DuplicateDataPolicy dupeStrat;

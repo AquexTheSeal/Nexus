@@ -6,7 +6,7 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_id}-forge"
+    archivesName = "${mod_id}-forge-${minecraft_version}"
 }
 
 java {
